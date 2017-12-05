@@ -1,36 +1,43 @@
 
 int[3] array;
+int global;
+int i;
 
 int func(int i)
 {
+    if(global)
+    {
+        int i;
+        i = i+1;
+    }
     return i+1;
 }
 
 int a, b;
 double c, d;
 
-a = 5;
-b = ((-a +- 13)*10/4) - 5;
-c = 3.14;
-
-if(a == 4)
+void main()
 {
-    a = a+1;
-}
-else
-{
-    a = a - 1;
-}
-print(a);
-
-int index;
-index = 0;
-while(true)
-{
-    index = index + 1;
-    if(index >= 100)
+    if(a == 4)
     {
-        print(index);
-        break; 
+        a = a+1;
+    }
+    else
+    {
+        a = a - 1;
+    }
+    print(a);
+    int index;
+    index = 0;
+    while(true)
+    {
+        index = index + 1;
+        if(index >= 100)
+        {
+            print(index);
+            break; 
+        }
     }
 }
+
+

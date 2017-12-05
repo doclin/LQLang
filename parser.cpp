@@ -20,20 +20,34 @@ void Parser::parse(const char* c)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int Parser::getNextToken()
 {
     while(isBlank(*code))
     {
         if(*code == '\n')
-        {
-            line++;
-            pos = 1;
-        }
+            { line++; pos = 1; }
         else
             pos++;
         code++;
     }
-
     if(*code == '\0')
         return 0;
     else if((isCPChar(*code) || *code=='!') && *(code+1)=='=')

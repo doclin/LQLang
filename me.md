@@ -37,12 +37,14 @@ by whu Doclin
 <level2>            ::= + | -
 <expr2>             ::= <expr3> <term2>
 <term2>             ::= <level3> <expr3> <term2> | e
-<level3>            ::= * | / | %
+<level3>            ::= * | / 
 <expr3>             ::= <level4> <expr4>
 <level4>            ::= - | e
 <expr4>             ::= (<expr>) | <value> | ID(<argList>) | INT | DOUBLE 
 ```
 
+采用C-style作用域
+语法最后改
 
 
 
@@ -69,7 +71,6 @@ IR封装类
 
 参考龙书：
 语法树
-scope
 符号表
 寄存器分配
 
