@@ -8,6 +8,7 @@ class Parser
 {
 private:
     enum { INTVALUE=2001, DOUBLEVALUE, INTK=3001, DOUBLEK, IFK, ELSEK, WHILEK, BREAKK, VOIDK, RETURNK, IDK };
+    enum { TVOID=0, TINT, TDOUBLE, TINTARR, TDOUBLEARR };
     const char* code;
     int crtToken;
     size_t line;
@@ -35,6 +36,14 @@ private:
     inline bool matchT(int t) { if(crtToken==t) { crtToken = getNextToken(); return true;} else return false; }
     void program();
     void glbStatements();
+    void lclStatements();
+    void varStmt();
+    void ifStmt();
+    void whileStmt();
+    void breakStmt();
+    void returnStmt();
+
+
     void expr();
     void expr1();
     void expr2();
