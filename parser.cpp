@@ -5,14 +5,111 @@ void Parser::parse(const char* c)
 {
     code = c;
     crtToken = getNextToken();
+    program();
+}
 
-    while(crtToken != 0 && crtToken != -1)
+void Parser::program()
+{
+    if(crtToken==INTK || crtToken==DOUBLEK || crtToken==VOIDK)
     {
-        std::cout << crtToken << std::endl;
+        tree.addRoot();
+        glbStatements();
+    }
+    else
+        throw 0;
+}
+
+void Parser::glbStatements()
+{
+    if(crtToken==INTK || crtToken==DOUBLEK)
+    {
+        int typeFlag;
+        size_t arrLength;
+        //varType();
+
+
+        
+    }
+}
+
+
+void Parser::expr()
+{
+    if(crtToken==IDK || crtToken=='(' || crtToken=='-' || crtToken==INTVALUE || crtToken==DOUBLEVALUE)
+    {
+        tree.addExpr();
+        expr1();
+        while(isLevel1(crtToken))
+        {
+            //tree.addLevel1();
+            crtToken = getNextToken();
+            expr1();
+        }
+        if(crtToken==')' || crtToken==';' || crtToken==',')
+            ;
+        else
+            throw 1;
+    }
+    else
+        throw 0;
+}
+
+void Parser::expr1()
+{
+    if(crtToken==IDK || crtToken=='(' || crtToken=='-' || crtToken==INTVALUE || crtToken==DOUBLEVALUE)
+    {
+        //tree
+        expr2();
+        while(isLevel2(crtToken))
+        {
+            //tree
+            crtToken = getNextToken();
+            expr2();
+        }
+        if(crtToken==')' || crtToken==';' || crtToken==',' || isLevel1(crtToken))
+            ;
+        else
+            throw 1;
+    }
+    else
+        throw 1;
+}
+
+void Parser::expr2()
+{
+    if(crtToken==IDK || crtToken=='(' || crtToken=='-' || crtToken==INTVALUE || crtToken==DOUBLEVALUE)
+    {
+        //tree
+        expr3();
+        while(isLevel3(crtToken))
+        {
+            //tree
+            crtToken = getNextToken();
+            expr3();
+        }
+        if(crtToken==')' || crtToken==';' || crtToken==',' || isLevel1(crtToken) || isLevel2(crtToken))
+            ;
+        else
+            throw 1;
+    }
+    else
+        throw 1;    
+}
+
+void Parser::expr3()
+{
+    int negativeFlag = false;
+    if(crtToken=='-')
+    {
+        negativeFlag = true;
         crtToken = getNextToken();
     }
+    if(crtToken==IDK)
+    {
         
+    }
 }
+
 
 
 
