@@ -45,11 +45,16 @@ void Parser::glbStatements()
                     typeFlag = TDOUBLEARR;
                 arrLength = INTVALUE;
                 crtToken = getNextToken();
+                variables();
+                if(crtToken == ';')
+                    crtToken = getNextToken();
+                else
+                    throw 1;
             }
             else
                 throw line;
         }
-        if(crtToken == IDK)
+        else if(crtToken == IDK)
         {
             crtToken = getNextToken();
             if(crtToken=='(')
@@ -204,27 +209,11 @@ void Parser::varStmt()
             else
                 throw line;
         }
-        if(crtToken == IDK)
-        {
+        variables();
+        if(crtToken == ';')
             crtToken = getNextToken();
-            if(crtToken == ';')
-            {
-                crtToken = getNextToken();
-            }
-            else if(crtToken == ',')
-            {
-                crtToken = getNextToken();
-                variables();
-                if(crtToken == ';')
-                    crtToken = getNextToken();
-                else
-                    throw line;
-            }
-            else
-                throw line;
-        }
         else
-            throw line;
+            throw 1;
     }
     else
         throw line;

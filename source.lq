@@ -1,6 +1,6 @@
 
-int[3] array;
-int global;
+int[3] array, r;
+int global, d;
 int i;
 
 int func(int i)
@@ -13,7 +13,7 @@ int func(int i)
     return i+1;
 }
 
-int a, b;
+int[2] a, b;
 double c, d;
 
 void main()
