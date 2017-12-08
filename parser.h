@@ -2,7 +2,6 @@
 #define _PARSER_H_
 
 #include <cstring>
-#include "AST.h"
 
 class Parser
 {
@@ -18,7 +17,7 @@ private:
     const char* IDValue;
     size_t IDLength;
 
-    AST tree;
+    //AST tree;
     
 
     int getNextToken();
@@ -33,24 +32,21 @@ private:
     int IDDFA();
     inline bool isKeyWord(const char* s, const char* k, size_t len) { return (memcmp(s, k, len)==0 && !isNum(*(code+len)) && !isABC(*(code+len))); }
 
-    inline bool matchT(int t) { if(crtToken==t) { crtToken = getNextToken(); return true;} else return false; }
     void program();
     void glbStatements();
     void lclStatements();
     void varStmt();
     void ifStmt();
+    void elseStmt();
     void whileStmt();
     void breakStmt();
     void returnStmt();
-
-
+    void parameters();
+    void arguments();
+    void variables();
     void expr();
-    void expr1();
-    void expr2();
-    void expr3();
-    inline bool isLevel1(int t) { return (t=='<' || t=='>' || t==1000+'=' || t==1000+'<' || t==1000+'!' || t==1000+'>'); }
-    inline bool isLevel2(int t) { return (t=='+' || t=='-'); }
-    inline bool isLevel3(int t) { return (t=='*' || t=='/'); }
+    void operand();
+    inline bool isOperator(int t) { return (t=='<' || t=='>' || t==1000+'=' || t==1000+'<' || t==1000+'!' || t==1000+'>' || t=='+' || t=='-' || t=='*' || t=='/'); }
 
 
 

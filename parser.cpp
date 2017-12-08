@@ -5,18 +5,23 @@ void Parser::parse(const char* c)
 {
     code = c;
     crtToken = getNextToken();
-    program();
+    try{
+        program();
+    }
+    catch(size_t i)
+    {
+        std::cout << "GG:" << i << std::endl;
+    }
 }
 
 void Parser::program()
 {
     if(crtToken==INTK || crtToken==DOUBLEK || crtToken==VOIDK)
     {
-        tree.addRoot();
         glbStatements();
     }
     else
-        throw 0;
+        throw line;
 }
 
 void Parser::glbStatements()
@@ -42,7 +47,7 @@ void Parser::glbStatements()
                 crtToken = getNextToken();
             }
             else
-                throw 1;
+                throw line;
         }
         if(crtToken == IDK)
         {
@@ -57,11 +62,11 @@ void Parser::glbStatements()
                     lclStatements();
                 }
                 else
-                    throw 1;
+                    throw line;
                 if(crtToken == '}')
                     crtToken = getNextToken();
                 else
-                    throw 1;
+                    throw line;
             }
             else if(crtToken == ';')
             {
@@ -74,13 +79,13 @@ void Parser::glbStatements()
                 if(crtToken == ';')
                     crtToken = getNextToken();
                 else
-                    throw 1;
+                    throw line;
             }
             else
-                throw 1;
+                throw line;
         }
         else
-            throw 1;  
+            throw line;  
     }
     else if(crtToken == VOIDK)
     {
@@ -95,25 +100,25 @@ void Parser::glbStatements()
                 if(crtToken == '}')
                     crtToken = getNextToken();
                 else
-                    throw 1;
+                    throw line;
             }
             else
-                throw 1;
+                throw line;
         }
         else
-            throw 1;
+            throw line;
     }
     else if(crtToken == 0)
         return;
     else
-        throw 1;
+        throw line;
     glbStatements();
 }
 
 
 void Parser::lclStatements()
 {
-    if(crtToken==INTK && crtToken==DOUBLEK)
+    if(crtToken==INTK || crtToken==DOUBLEK)
         varStmt();
     else if(crtToken == IFK)
         ifStmt();
@@ -131,7 +136,27 @@ void Parser::lclStatements()
             if(crtToken==')' && getNextToken()==';')
                 crtToken = getNextToken();
             else
-                throw 1;
+                throw line;
+        }
+        else if(crtToken == '[')
+        {
+            if(getNextToken()==INTVALUE && getNextToken()==']')
+            {
+                crtToken = getNextToken();
+                if(crtToken == '=')
+                {
+                    crtToken = getNextToken();
+                    expr();
+                    if(crtToken == ';')
+                        crtToken = getNextToken();
+                    else
+                        throw line;
+                }
+                else
+                    throw line;
+            }
+            else
+                throw line;
         }
         else if(crtToken == '=')
         {
@@ -140,21 +165,185 @@ void Parser::lclStatements()
             if(crtToken == ';')
                 crtToken = getNextToken();
             else
-                throw 1;
+                throw line;
         }
         else
-            throw 1;
+            throw line;
     }
     else if(crtToken == RETURNK)
         returnStmt();
     else if(crtToken == '}')
         return;
     else
-        throw 1;
+        throw line;
     lclStatements();
 }
 
 void Parser::varStmt()
+{
+    if(crtToken==INTK || crtToken==DOUBLEK)
+    {
+        int typeFlag;
+        size_t arrLength;
+        if(crtToken==INTK)
+            typeFlag = TINT;
+        else
+            typeFlag = TDOUBLE;
+        crtToken = getNextToken();
+        if(crtToken == '[')
+        {
+            if(getNextToken()==INTVALUE && getNextToken()==']')
+            {
+                if(typeFlag==TINT)
+                    typeFlag = TINTARR;
+                else
+                    typeFlag = TDOUBLEARR;
+                arrLength = INTVALUE;
+                crtToken = getNextToken();
+            }
+            else
+                throw line;
+        }
+        if(crtToken == IDK)
+        {
+            crtToken = getNextToken();
+            if(crtToken == ';')
+            {
+                crtToken = getNextToken();
+            }
+            else if(crtToken == ',')
+            {
+                crtToken = getNextToken();
+                variables();
+                if(crtToken == ';')
+                    crtToken = getNextToken();
+                else
+                    throw line;
+            }
+            else
+                throw line;
+        }
+        else
+            throw line;
+    }
+    else
+        throw line;
+}
+
+void Parser::ifStmt()
+{
+    if(crtToken == IFK)
+    {
+        if(getNextToken() == '(')
+        {
+            crtToken = getNextToken();
+            expr();
+            if(crtToken==')' && getNextToken()=='{')
+            {
+                crtToken = getNextToken();
+                lclStatements();
+                if(crtToken == '}')
+                {
+                    crtToken = getNextToken();
+                    elseStmt();
+                }
+                else
+                    throw line;
+            }
+            else
+                throw line;
+        }
+        else
+            throw line;
+    }
+    else
+        throw line;
+}
+
+void Parser::elseStmt()
+{
+    if(crtToken == ELSEK)
+    {
+        if(getNextToken() == '{')
+        {
+            crtToken = getNextToken();
+            lclStatements();
+            if(crtToken == '}')
+            {
+                crtToken = getNextToken();
+            }
+            else
+                throw line;
+        }
+        else
+            throw line;
+    }
+    else if(crtToken==INTK || crtToken==DOUBLEK || crtToken==IFK || crtToken==WHILEK || crtToken==BREAKK || crtToken==RETURNK || crtToken==IDK || crtToken=='}')
+        return;
+    else
+        throw line;
+}
+
+
+
+void Parser::whileStmt()
+{
+    if(crtToken == WHILEK)
+    {
+        if(getNextToken() == '(')
+        {
+            crtToken = getNextToken();
+            expr();
+            if(crtToken==')' && getNextToken()=='{')
+            {
+                crtToken = getNextToken();
+                lclStatements();
+                if(crtToken == '}')
+                {
+                    crtToken = getNextToken();
+                }
+                else
+                    throw line;
+            }
+            else
+                throw line;
+        }
+        else
+            throw line;
+    }
+    else
+        throw line;
+}
+
+void Parser::breakStmt()
+{
+    if(crtToken == BREAKK)
+    {
+        if(getNextToken() == ';')
+            crtToken = getNextToken();
+        else
+            throw line;
+    }
+    else
+        throw line;
+}
+
+void Parser::returnStmt()
+{
+    if(crtToken == RETURNK)
+    {
+        crtToken = getNextToken();
+        expr();
+        if(crtToken == ';')
+            crtToken = getNextToken();
+        else
+            throw line;
+    }
+    else
+        throw line;
+}
+
+void Parser::parameters()
 {
     if(crtToken==INTK || crtToken==DOUBLEK)
     {
@@ -177,249 +366,146 @@ void Parser::varStmt()
                 crtToken = getNextToken();
             }
             else
-                throw 1;
+                throw line;
         }
         if(crtToken == IDK)
         {
             crtToken = getNextToken();
-            if(crtToken == ';')
+            if(crtToken == ')')
             {
-                crtToken = getNextToken();
+                return;
             }
             else if(crtToken == ',')
             {
                 crtToken = getNextToken();
-                variables();
-                if(crtToken == ';')
-                    crtToken = getNextToken();
-                else
-                    throw 1;
+                parameters();
             }
             else
-                throw 1;
+                throw line;
         }
         else
-            throw 1;
+            throw line;
     }
+    else if(crtToken == ')')
+        return;
     else
-        throw 1;
+        throw line;    
 }
 
-void Parser::ifStmt()
+void Parser::arguments()
 {
-    if(crtToken == IFK)
+    if(crtToken==IDK || crtToken=='(' || crtToken=='-' || crtToken==INTVALUE || crtToken==DOUBLEVALUE)
     {
-        if(getNextToken() == '(')
+        expr();
+        if(crtToken == ',')
         {
             crtToken = getNextToken();
-            expr();
-            if(crtToken==')' && getNextToken()=='{')
-            {
-                crtToken = getNextToken();
-                lclStatements();
-                if(crtToken == '}')
-                {
-                    crtToken = getNextToken();
-                    elseStmt();
-                }
-                else
-                    throw 1;
-            }
-            else
-                throw 1;
+            arguments();
         }
-        else
-            throw 1;
-    }
-    else
-        throw 1;
-}
-
-void Parser::whileStmt()
-{
-    if(crtToken == WHILEK)
-    {
-        if(getNextToken() == '(')
+        else if(crtToken == ')')
         {
-            crtToken = getNextToken();
-            expr();
-            if(crtToken==')' && getNextToken()=='{')
-            {
-                crtToken = getNextToken();
-                lclStatements();
-                if(crtToken == '}')
-                {
-                    crtToken = getNextToken();
-                }
-                else
-                    throw 1;
-            }
-            else
-                throw 1;
+            return;
         }
         else
-            throw 1;
+            throw line;
     }
+    else if(crtToken == ')')
+        return;
     else
-        throw 1;
+        throw line;
 }
 
-void Parser::breakStmt()
+void Parser::variables()
 {
-    if(crtToken == BREAKK)
-    {
-        if(getNextToken() == ';')
-            crtToken = getNextToken();
-        else
-            throw 1;
-    }
-    else
-        throw 1;
-}
-
-void Parser::returnStmt()
-{
-    if(crtToken == RETURNK)
+    if(crtToken == IDK)
     {
         crtToken = getNextToken();
-        expr();
-        if(crtToken == ';')
+        if(crtToken == ',')
+        {
             crtToken = getNextToken();
+            variables();
+        }
+        else if(crtToken == ';')
+            return;
         else
-            throw 1;
+            throw line;
     }
+    else if(crtToken == ';')
+        return;
     else
-        throw 1;
+        throw line;
 }
-
-
-
-
-
-
-
-
-
-
 
 void Parser::expr()
 {
     if(crtToken==IDK || crtToken=='(' || crtToken=='-' || crtToken==INTVALUE || crtToken==DOUBLEVALUE)
     {
-        tree.addExpr();
-        expr1();
-        while(isLevel1(crtToken))
+        operand();
+        if(isOperator(crtToken))
         {
-            //tree.addLevel1();
             crtToken = getNextToken();
-            expr1();
+            expr();
         }
-        if(crtToken==')' || crtToken==';' || crtToken==',')
-            ;
+        else if(crtToken==')' || crtToken==';' || crtToken==',')
+            return;
         else
-            throw 1;
+            throw line;
     }
     else
-        throw 0;
+        throw line;
 }
 
-void Parser::expr1()
+void Parser::operand()
 {
-    if(crtToken==IDK || crtToken=='(' || crtToken=='-' || crtToken==INTVALUE || crtToken==DOUBLEVALUE)
-    {
-        //tree
-        expr2();
-        while(isLevel2(crtToken))
-        {
-            //tree
-            crtToken = getNextToken();
-            expr2();
-        }
-        if(crtToken==')' || crtToken==';' || crtToken==',' || isLevel1(crtToken))
-            ;
-        else
-            throw 1;
-    }
-    else
-        throw 1;
-}
-
-void Parser::expr2()
-{
-    if(crtToken==IDK || crtToken=='(' || crtToken=='-' || crtToken==INTVALUE || crtToken==DOUBLEVALUE)
-    {
-        //tree
-        expr3();
-        while(isLevel3(crtToken))
-        {
-            //tree
-            crtToken = getNextToken();
-            expr3();
-        }
-        if(crtToken==')' || crtToken==';' || crtToken==',' || isLevel1(crtToken) || isLevel2(crtToken))
-            ;
-        else
-            throw 1;
-    }
-    else
-        throw 1;    
-}
-
-void Parser::expr3()
-{
-    int negativeFlag = false;
     if(crtToken == '-')
     {
-        negativeFlag = true;
         crtToken = getNextToken();
     }
     if(crtToken == IDK)
     {
         crtToken = getNextToken();
-        if(crtToken == '[')
+        if(crtToken == '(')
         {
-            //
             crtToken = getNextToken();
-            if(crtToken == INTVALUE)
+            arguments();
+            if(crtToken==')')
                 crtToken = getNextToken();
             else
-                throw 1;
-            if(crtToken == ']')
-                crtToken = getNextToken();
-            else
-                throw 1;
+                throw line;
         }
-        else if(crtToken == '(')
+        else if(crtToken == '[')
         {
-            //
-            //while
+            if(getNextToken()==INTVALUE && getNextToken()==']')
+            {
+                crtToken = getNextToken();
+            }
+            else
+                throw line;
         }
-        else if(crtToken=='+')
-            ;
+        else if(isOperator(crtToken) || crtToken==')' || crtToken==';' || crtToken==',')
+        {
+            return;
+        }
         else
-            throw 1;
+            throw line;
     }
+    else if(crtToken == '(')
+    {
+        crtToken = getNextToken();
+        expr();
+        if(crtToken == ')')
+            crtToken = getNextToken();
+        else
+            throw line;
+    }
+    else if(crtToken==INTVALUE || crtToken==DOUBLEVALUE)
+    {
+        crtToken = getNextToken();
+    }
+    else
+        throw line;
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -16,18 +16,17 @@ int main () {
 
     char * buffer = new char [length+1];
 
-    std::cout << "Reading " << length << " characters... ";
+    //std::cout << "Reading " << length << " characters... ";
     // read data as a block:
     is.read (buffer,length);
 
     if (is)
-      std::cout << "all characters read successfully.";
+      std::cout << "all characters read successfully.\n";
     else
       std::cout << "error: only " << is.gcount() << " could be read";
     is.close();
     buffer[length] = '\0';
 
-    cout << buffer << endl;
     Parser p;
     p.parse(buffer);
 
