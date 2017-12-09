@@ -136,24 +136,6 @@ void Parser::glbStatements()
     glbStatements();
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void Parser::lclStatements()
 {
     if(crtToken==INTK || crtToken==DOUBLEK)
@@ -169,8 +151,10 @@ void Parser::lclStatements()
         crtToken = getNextToken();
         if(crtToken == '(')
         {
+            tree.addFuncCall(IDValue, IDLength);
             crtToken = getNextToken();
             arguments();
+            tree.endArguments();
             if(crtToken==')' && getNextToken()==';')
                 crtToken = getNextToken();
             else
@@ -183,10 +167,16 @@ void Parser::lclStatements()
                 crtToken = getNextToken();
                 if(crtToken == '=')
                 {
+                    tree.addAssign(IDValue, IDLength, integerValue);
                     crtToken = getNextToken();
+                    tree.addExpr();
                     expr();
+                    tree.endExpr();
                     if(crtToken == ';')
+                    {
+                        tree.endAssign();
                         crtToken = getNextToken();
+                    }            
                     else
                         throw line;
                 }
@@ -198,10 +188,16 @@ void Parser::lclStatements()
         }
         else if(crtToken == '=')
         {
+            tree.addAssign(IDValue, IDLength);
             crtToken = getNextToken();
+            tree.addExpr();
             expr();
+            tree.endExpr();
             if(crtToken == ';')
+            {
+                tree.endAssign();
                 crtToken = getNextToken();
+            }  
             else
                 throw line;
         }
@@ -242,7 +238,7 @@ void Parser::varStmt()
             else
                 throw line;
         }
-        variables();
+        variables(typeFlag, arrLength);
         if(crtToken == ';')
             crtToken = getNextToken();
         else
@@ -258,16 +254,22 @@ void Parser::ifStmt()
     {
         if(getNextToken() == '(')
         {
+            tree.addIf();
             crtToken = getNextToken();
+            tree.addExpr();
             expr();
+            tree.endExpr();
+            tree.endIfVal();
             if(crtToken==')' && getNextToken()=='{')
             {
                 crtToken = getNextToken();
                 lclStatements();
+                tree.endIfTrue();
                 if(crtToken == '}')
                 {
                     crtToken = getNextToken();
                     elseStmt();
+                    tree.endIFFalse();
                 }
                 else
                     throw line;
@@ -314,14 +316,19 @@ void Parser::whileStmt()
     {
         if(getNextToken() == '(')
         {
+            tree.addWhile();
             crtToken = getNextToken();
+            tree.addExpr();
             expr();
+            tree.endExpr();
+            tree.endWhileVal();
             if(crtToken==')' && getNextToken()=='{')
             {
                 crtToken = getNextToken();
                 lclStatements();
                 if(crtToken == '}')
                 {
+                    tree.endWhile();
                     crtToken = getNextToken();
                 }
                 else
@@ -357,10 +364,16 @@ void Parser::returnStmt()
 {
     if(crtToken == RETURNK)
     {
+        tree.addReturn();
         crtToken = getNextToken();
+        tree.addExpr();
         expr();
+        tree.endExpr();
         if(crtToken == ';')
+        {
+            tree.endReturn();
             crtToken = getNextToken();
+        }
         else
             throw line;
     }
@@ -395,7 +408,7 @@ void Parser::parameters()
         }
         if(crtToken == IDK)
         {
-            tree.addParameter(IDValue, IDLength, typeFlag, arrLength);
+            tree.addVariable(IDValue, IDLength, typeFlag, arrLength);
             crtToken = getNextToken();
             if(crtToken == ')')
                 return;
@@ -420,7 +433,9 @@ void Parser::arguments()
 {
     if(crtToken==IDK || crtToken=='(' || crtToken=='-' || crtToken==INTVALUE || crtToken==DOUBLEVALUE)
     {
+        tree.addExpr();
         expr();
+        tree.endExpr();
         if(crtToken == ',')
         {
             crtToken = getNextToken();
@@ -468,6 +483,7 @@ void Parser::expr()
         operand();
         if(isOperator(crtToken))
         {
+            tree.addOperator(crtToken);
             crtToken = getNextToken();
             expr();
         }
@@ -482,8 +498,10 @@ void Parser::expr()
 
 void Parser::operand()
 {
+    int negativeFlag = false;
     if(crtToken == '-')
     {
+        negativeFlag = true;
         crtToken = getNextToken();
     }
     if(crtToken == IDK)
@@ -491,8 +509,10 @@ void Parser::operand()
         crtToken = getNextToken();
         if(crtToken == '(')
         {
+            tree.addFuncCall(IDValue, IDLength, negativeFlag);
             crtToken = getNextToken();
             arguments();
+            tree.endArguments();
             if(crtToken==')')
                 crtToken = getNextToken();
             else
@@ -502,6 +522,7 @@ void Parser::operand()
         {
             if(getNextToken()==INTVALUE && getNextToken()==']')
             {
+                tree.addVarVal(IDValue, IDLength, integerValue, negativeFlag);
                 crtToken = getNextToken();
             }
             else
@@ -509,6 +530,7 @@ void Parser::operand()
         }
         else if(isOperator(crtToken) || crtToken==')' || crtToken==';' || crtToken==',')
         {
+            tree.addVarVal(IDValue, IDLength, -1, negativeFlag);
             return;
         }
         else
@@ -516,26 +538,30 @@ void Parser::operand()
     }
     else if(crtToken == '(')
     {
+        tree.addOperator('(');
         crtToken = getNextToken();
         expr();
         if(crtToken == ')')
+        {
+            tree.addOperator(')');
             crtToken = getNextToken();
+        }
         else
             throw line;
     }
-    else if(crtToken==INTVALUE || crtToken==DOUBLEVALUE)
+    else if(crtToken==INTVALUE)
     {
+        tree.addInt(integerValue, negativeFlag);
         crtToken = getNextToken();
     }
+    else if(crtToken==DOUBLEVALUE)
+    {
+        tree.addDouble(doubleValue, negativeFlag);
+        crtToken = getNextToken();
+    }    
     else
         throw line;
-
 }
-
-
-
-
-
 
 int Parser::getNextToken()
 {

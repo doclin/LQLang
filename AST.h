@@ -10,6 +10,7 @@ class ASTNode
 {
 public:
     enum { VARNODE=1, FUNCNODE, CALLNODE, ASSIGNNODE, IFNODE, WHILENODE, BREAKNODE, RETURNNODE, EXPRNODE, INTNODE, DOUBLENODE, VARVALNODE, OPERATORNODE };
+    enum { TVOID=0, TINT, TDOUBLE, TINTARR, TDOUBLEARR, TFUNC };
     int nodeType;
     ASTNode* next;
     ASTNode() {}
@@ -43,10 +44,11 @@ public:
 class CallNode : public ASTNode
 {
 public:
+    bool negativeFlag;
     size_t name;
     ASTNode* args;
     CallNode() : ASTNode::ASTNode() {}
-    CallNode(size_t n) : ASTNode::ASTNode(CALLNODE), name(n), args(NULL) {}
+    CallNode(size_t n, bool f=false) : ASTNode::ASTNode(CALLNODE), name(n), args(NULL), negativeFlag(f) {}
     virtual ~CallNode() {}
 };
 
@@ -54,10 +56,10 @@ class AssignNode : public ASTNode
 {
 public:
     size_t name;
-    size_t arrIndex;
+    int arrIndex;
     ASTNode* value;
     AssignNode() : ASTNode::ASTNode() {}
-    AssignNode(size_t n, size_t i) : ASTNode::ASTNode(ASSIGNNODE), name(n), arrIndex(i), value(NULL) {}
+    AssignNode(size_t n, int i=-1) : ASTNode::ASTNode(ASSIGNNODE), name(n), arrIndex(i), value(NULL) {}
     virtual ~AssignNode() {}
 };
 
@@ -106,28 +108,31 @@ public:
 class IntNode : public ASTNode
 {
 public:
+    bool negativeFlag;
     int value;
     IntNode() : ASTNode::ASTNode() {}
-    IntNode(int v) : ASTNode::ASTNode(INTNODE), value(v) {}
+    IntNode(int v, bool f=false) : ASTNode::ASTNode(INTNODE), value(v), negativeFlag(f) {}
     virtual ~IntNode() {}
 };
 
 class DoubleNode : public ASTNode
 {
 public:
+    bool negativeFlag;
     double value;
     DoubleNode() : ASTNode::ASTNode() {}
-    DoubleNode(double v) : ASTNode::ASTNode(DOUBLENODE), value(v) {}
+    DoubleNode(double v, bool f=false) : ASTNode::ASTNode(DOUBLENODE), value(v), negativeFlag(f) {}
     virtual ~DoubleNode() {}
 };
 
 class VarValNode : public ASTNode
 {
 public:
+    bool negativeFlag;
     size_t name;
-    size_t arrIndex;
+    int arrIndex;
     VarValNode() : ASTNode::ASTNode() {}
-    VarValNode(size_t n, size_t i) : ASTNode::ASTNode(VARVALNODE), name(n), arrIndex(i) {}
+    VarValNode(size_t n, int i=-1, bool f=false) : ASTNode::ASTNode(VARVALNODE), name(n), arrIndex(i), negativeFlag(f) {}
     virtual ~VarValNode() {}    
 };
 
@@ -144,13 +149,6 @@ public:
 
 
 
-
-
-
-
-
-
-
 class AST
 {
 private:
@@ -160,25 +158,30 @@ private:
     size_t IDCount;
 public:
     bool addRoot();
-    bool addVariable(const char* name, size_t nameLength, int typeFlag, size_t arrLength=0);
     bool addFuncDef(const char* name, size_t nameLength, int typeFlag);
     bool endFuncDef();
-    bool addParameter(const char* name, size_t nameLength, int typeFlag, size_t arrLength=0);
-    bool addFuncCall(const char* name, size_t nameLength);
+    bool endParameters();
+    bool addVariable(const char* name, size_t nameLength, int typeFlag, size_t arrLength=0);
+    bool addFuncCall(const char* name, size_t nameLength, bool negativeFlag=false);
+    bool endArguments();
+    bool addAssign(const char* name, size_t nameLength, int arrIndex=-1);
+    bool addExpr();
+    bool endExpr();
+    bool endAssign();
     bool addIf();
-    bool addElse();
-    bool endElse();
-    bool endIf();
+    bool endIfVal();
+    bool endIfTrue();
+    bool endIFFalse();
     bool addWhile();
+    bool endWhileVal();
     bool endWhile();
     bool addBreak();
     bool addReturn();
-    bool addAssign(const char* name, size_t nameLength, size_t index=0);
-
-    bool addExpr();
-    bool addExpr1();
-    bool addExpr2();
-    bool addExpr3();
+    bool endReturn();
+    bool addOperator(int op);
+    bool addVarVal(const char* name, size_t nameLength, int arrIndex=-1, bool negativeFlag=false);
+    bool addInt(int value, bool negativeFlag=false);
+    bool addDouble(double value, bool negativeFlag=false);
 };
 
 
