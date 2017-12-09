@@ -4,6 +4,8 @@
 void Parser::parse(const char* c)
 {
     code = c;
+    if(code == NULL)
+        return;
     crtToken = getNextToken();
     try{
         program();

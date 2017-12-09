@@ -1,8 +1,8 @@
 #ifndef _AST_H_
 #define _AST_H_
 
-
 #include <iostream>
+#include <stack>
 #include "symbolTable.h"
 
 
@@ -147,16 +147,19 @@ public:
 
 
 
-
-
 class AST
 {
 private:
+    enum { VARNODE=1, FUNCNODE, CALLNODE, ASSIGNNODE, IFNODE, WHILENODE, BREAKNODE, RETURNNODE, EXPRNODE, INTNODE, DOUBLENODE, VARVALNODE, OPERATORNODE };
+    enum { TVOID=0, TINT, TDOUBLE, TINTARR, TDOUBLEARR, TFUNCINT, TFUNCDOUBLE };
     SymbolTable table;
     ASTNode* root;
     ASTNode** crtNode;
+    std::stack<ASTNode*> stk;
     size_t IDCount;
+    bool breakFlag;
 public:
+    AST() : root(NULL), crtNode(NULL), IDCount(0), breakFlag(false) {}
     bool addRoot();
     bool addFuncDef(const char* name, size_t nameLength, int typeFlag);
     bool endFuncDef();
@@ -182,6 +185,7 @@ public:
     bool addVarVal(const char* name, size_t nameLength, int arrIndex=-1, bool negativeFlag=false);
     bool addInt(int value, bool negativeFlag=false);
     bool addDouble(double value, bool negativeFlag=false);
+    ~AST() {}
 };
 
 

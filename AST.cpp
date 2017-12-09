@@ -1,25 +1,79 @@
 #include "AST.h"
 
-//void addRoot();
-//void addVariable(const char* name, size_t nameLength, int typeFlag, size_t arrLength=0);
-//void addFuncDef(const char* name, size_t nameLength, int typeFlag, size_t arrLength=0);
-//void endFuncDef();
-//void addParameter(const char* name, size_t nameLength, int typeFlag, size_t arrLength=0);
-//void addFuncCall(const char* name, size_t nameLength);
-//void addIf();
-//void addElse();
-//void endElse();
-//void endIf();
-//void addWhile();
-//void endWhile();
-//void addBreak();
-//void addReturn();
-//void addAssign(const char* name, size_t nameLength, size_t index=0);
-//
-//void addExpr();
-//void addExpr1();
-//void addExpr2();
-//void addExpr3();
+
+//enum { TVOID=0, TINT, TDOUBLE, TINTARR, TDOUBLEARR, TFUNC };
+//SymbolTable table;
+//ASTNode* root;
+//ASTNode** crtNode;
+//std::stack<ASTNode*> stk;
+//size_t IDCount;
+//bool breakFlag;
+
+//bool addRoot();
+//bool addFuncDef(const char* name, size_t nameLength, int typeFlag);
+//bool endFuncDef();
+//bool endParameters();
+//bool addVariable(const char* name, size_t nameLength, int typeFlag, size_t arrLength=0);
+//bool addFuncCall(const char* name, size_t nameLength, bool negativeFlag=false);
+//bool endArguments();
+//bool addAssign(const char* name, size_t nameLength, int arrIndex=-1);
+//bool addExpr();
+//bool endExpr();
+//bool endAssign();
+//bool addIf();
+//bool endIfVal();
+//bool endIfTrue();
+//bool endIFFalse();
+//bool addWhile();
+//bool endWhileVal();
+//bool endWhile();
+//bool addBreak();
+//bool addReturn();
+//bool endReturn();
+//bool addOperator(int op);
+//bool addVarVal(const char* name, size_t nameLength, int arrIndex=-1, bool negativeFlag=false);
+//bool addInt(int value, bool negativeFlag=false);
+//bool addDouble(double value, bool negativeFlag=false);
+
+bool AST::addRoot()
+{
+    table.addScope();
+    crtNode = &root;
+    return true;
+}
+
+bool AST::addFuncDef(const char* name, size_t nameLength, int typeFlag)
+{
+    if(!table.addName(name, nameLength, IDCount, typeFlag+4))
+        return false;
+    *crtNode = new FuncNode(IDCount, typeFlag);
+    stk.push(*crtNode);
+    crtNode = &(static_cast<FuncNode*>(*crtNode) -> params);
+    table.addScope();
+    IDCount++;
+    return true;
+}
+
+bool AST::endFuncDef()
+{
+    if(stk.top()->nodeType != FUNCNODE)
+        return false;
+    crtNode = &(stk.top()->next);
+    stk.pop();
+    table.popScope();
+    return true;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 bool AST::addVariable(const char* name, size_t nameLength, int typeFlag, size_t arrLength=0)
 {
@@ -27,19 +81,6 @@ bool AST::addVariable(const char* name, size_t nameLength, int typeFlag, size_t 
     {
         *crtNode = new VarNode(IDCount++, typeFlag, arrLength);
         crtNode = &(*crtNode)->next;
-        return true;
-    }
-    else
-        return false;
-}
-
-bool AST::addFuncDef(const char* name, size_t nameLength, int typeFlag)
-{
-    if(table.addName())
-    {
-        table.addScope();
-        *crtNode = new FuncNode(IDCount++, typeFlag);
-        crtNode = &static_cast<FuncNode*>(*crtNode)->params;
         return true;
     }
     else

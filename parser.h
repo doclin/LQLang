@@ -8,7 +8,7 @@ class Parser
 {
 private:
     enum { INTVALUE=2001, DOUBLEVALUE, INTK=3001, DOUBLEK, IFK, ELSEK, WHILEK, BREAKK, VOIDK, RETURNK, IDK };
-    enum { TVOID=0, TINT, TDOUBLE, TINTARR, TDOUBLEARR, TFUNC };
+    enum { TVOID=0, TINT, TDOUBLE, TINTARR, TDOUBLEARR, TFUNCINT, TFUNCDOUBLE };
     const char* code;
     int crtToken;
     size_t line;
