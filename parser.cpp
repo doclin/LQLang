@@ -18,6 +18,7 @@ void Parser::program()
 {
     if(crtToken==INTK || crtToken==DOUBLEK || crtToken==VOIDK)
     {
+        tree.addRoot();
         glbStatements();
     }
     else
@@ -43,9 +44,9 @@ void Parser::glbStatements()
                     typeFlag = TINTARR;
                 else
                     typeFlag = TDOUBLEARR;
-                arrLength = INTVALUE;
+                arrLength = integerValue;
                 crtToken = getNextToken();
-                variables();
+                variables(typeFlag, arrLength);
                 if(crtToken == ';')
                     crtToken = getNextToken();
                 else
@@ -59,6 +60,7 @@ void Parser::glbStatements()
             crtToken = getNextToken();
             if(crtToken=='(')
             {
+                tree.addFunc(IDValue, IDLength, typeFlag, arrLength);
                 crtToken = getNextToken();
                 parameters();
                 if(crtToken==')' && getNextToken()=='{')

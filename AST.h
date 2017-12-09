@@ -3,6 +3,7 @@
 
 
 #include <iostream>
+#include "symbolTable.h"
 
 
 class ASTNode
@@ -153,28 +154,31 @@ public:
 class AST
 {
 private:
-    int i;
+    SymbolTable table;
+    ASTNode* root;
+    ASTNode** crtNode;
+    size_t IDCount;
 public:
-    void addRoot();
-    void addVariable(const char* name, size_t nameLength, int typeFlag, size_t arrLength=0);
-    void addFuncDef(const char* name, size_t nameLength, int typeFlag, size_t arrLength=0);
-    void endFuncDef();
-    void addParameter(const char* name, size_t nameLength, int typeFlag, size_t arrLength=0);
-    void addFuncCall(const char* name, size_t nameLength);
-    void addIf();
-    void addElse();
-    void endElse();
-    void endIf();
-    void addWhile();
-    void endWhile();
-    void addBreak();
-    void addReturn();
-    void addAssign(const char* name, size_t nameLength, size_t index=0);
+    bool addRoot();
+    bool addVariable(const char* name, size_t nameLength, int typeFlag, size_t arrLength=0);
+    bool addFuncDef(const char* name, size_t nameLength, int typeFlag);
+    bool endFuncDef();
+    bool addParameter(const char* name, size_t nameLength, int typeFlag, size_t arrLength=0);
+    bool addFuncCall(const char* name, size_t nameLength);
+    bool addIf();
+    bool addElse();
+    bool endElse();
+    bool endIf();
+    bool addWhile();
+    bool endWhile();
+    bool addBreak();
+    bool addReturn();
+    bool addAssign(const char* name, size_t nameLength, size_t index=0);
 
-    void addExpr();
-    void addExpr1();
-    void addExpr2();
-    void addExpr3();
+    bool addExpr();
+    bool addExpr1();
+    bool addExpr2();
+    bool addExpr3();
 };
 
 

@@ -2,12 +2,13 @@
 #define _PARSER_H_
 
 #include <cstring>
+#include "AST.h"
 
 class Parser
 {
 private:
     enum { INTVALUE=2001, DOUBLEVALUE, INTK=3001, DOUBLEK, IFK, ELSEK, WHILEK, BREAKK, VOIDK, RETURNK, IDK };
-    enum { TVOID=0, TINT, TDOUBLE, TINTARR, TDOUBLEARR };
+    enum { TVOID=0, TINT, TDOUBLE, TINTARR, TDOUBLEARR, TFUNC };
     const char* code;
     int crtToken;
     size_t line;
@@ -17,7 +18,7 @@ private:
     const char* IDValue;
     size_t IDLength;
 
-    //AST tree;
+    AST tree;
     
 
     int getNextToken();
@@ -43,7 +44,7 @@ private:
     void returnStmt();
     void parameters();
     void arguments();
-    void variables();
+    void variables(int typeFlag, size_t arrLength=0);
     void expr();
     void operand();
     inline bool isOperator(int t) { return (t=='<' || t=='>' || t==1000+'=' || t==1000+'<' || t==1000+'!' || t==1000+'>' || t=='+' || t=='-' || t=='*' || t=='/'); }

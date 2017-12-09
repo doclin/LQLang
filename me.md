@@ -75,6 +75,21 @@ IR封装类
 符号表
 寄存器分配
 
+TODO：
+语法树
+解释器IR
+解释执行IR
+并行化     1day
+LLVM      1day
+
+
+名字查找
+非法语句：
+break
+return
+类型检查
+
+
 
 
 
