@@ -30,13 +30,13 @@ void Parser::glbStatements()
     if(crtToken==INTK || crtToken==DOUBLEK)
     {
         int typeFlag;
-        size_t arrLength;
+        size_t arrLength = 0;
         if(crtToken==INTK)
             typeFlag = TINT;
         else
             typeFlag = TDOUBLE;
         crtToken = getNextToken();
-        if(crtToken=='[')
+        if(crtToken == '[')
         {
             if(getNextToken()==INTVALUE && getNextToken()==']')
             {
@@ -46,7 +46,10 @@ void Parser::glbStatements()
                     typeFlag = TDOUBLEARR;
                 arrLength = integerValue;
                 crtToken = getNextToken();
-                variables(typeFlag, arrLength);
+                if(crtToken == IDK)
+                    variables(typeFlag, arrLength);
+                else
+                    throw line;
                 if(crtToken == ';')
                     crtToken = getNextToken();
                 else
@@ -60,9 +63,10 @@ void Parser::glbStatements()
             crtToken = getNextToken();
             if(crtToken=='(')
             {
-                tree.addFunc(IDValue, IDLength, typeFlag, arrLength);
+                tree.addFuncDef(IDValue, IDLength, typeFlag);
                 crtToken = getNextToken();
                 parameters();
+                tree.endParameters();
                 if(crtToken==')' && getNextToken()=='{')
                 {
                     crtToken = getNextToken();
@@ -71,18 +75,23 @@ void Parser::glbStatements()
                 else
                     throw line;
                 if(crtToken == '}')
+                {
+                    tree.endFuncDef();
                     crtToken = getNextToken();
+                }
                 else
                     throw line;
             }
             else if(crtToken == ';')
             {
+                tree.addVariable(IDValue, IDLength, typeFlag, arrLength);
                 crtToken = getNextToken();
             }
             else if(crtToken == ',')
             {
+                tree.addVariable(IDValue, IDLength, typeFlag, arrLength);
                 crtToken = getNextToken();
-                variables();
+                variables(typeFlag, arrLength);
                 if(crtToken == ';')
                     crtToken = getNextToken();
                 else
@@ -98,14 +107,19 @@ void Parser::glbStatements()
     {
         if(getNextToken()==IDK && getNextToken()=='(')
         {
+            tree.addFuncDef(IDValue, IDLength, TVOID);
             crtToken = getNextToken();
             parameters();
+            tree.endParameters();
             if(crtToken == ')' && getNextToken()=='{')
             {
                 crtToken = getNextToken();
                 lclStatements();
                 if(crtToken == '}')
+                {
+                    tree.endFuncDef();
                     crtToken = getNextToken();
+                }     
                 else
                     throw line;
             }
@@ -121,6 +135,23 @@ void Parser::glbStatements()
         throw line;
     glbStatements();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 void Parser::lclStatements()
@@ -311,7 +342,10 @@ void Parser::breakStmt()
     if(crtToken == BREAKK)
     {
         if(getNextToken() == ';')
+        {
+            tree.addBreak();
             crtToken = getNextToken();
+        }         
         else
             throw line;
     }
@@ -361,11 +395,10 @@ void Parser::parameters()
         }
         if(crtToken == IDK)
         {
+            tree.addParameter(IDValue, IDLength, typeFlag, arrLength);
             crtToken = getNextToken();
             if(crtToken == ')')
-            {
                 return;
-            }
             else if(crtToken == ',')
             {
                 crtToken = getNextToken();
@@ -406,15 +439,16 @@ void Parser::arguments()
         throw line;
 }
 
-void Parser::variables()
+void Parser::variables(int typeFlag, size_t arrLength)
 {
     if(crtToken == IDK)
     {
+        tree.addVariable(IDValue, IDLength, typeFlag, arrLength);
         crtToken = getNextToken();
         if(crtToken == ',')
         {
             crtToken = getNextToken();
-            variables();
+            variables(typeFlag, arrLength);
         }
         else if(crtToken == ';')
             return;

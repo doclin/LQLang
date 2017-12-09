@@ -20,7 +20,6 @@ private:
 
     AST tree;
     
-
     int getNextToken();
     inline bool isBlank(char c)     { return (c==' ' || c=='\t' || c=='\r' || c=='\n'); }
     inline bool isSPChar(char c)    { return (c==';' || c=='[' || c==']' || c=='{' || c=='}' || c=='(' || c==')' || c==','); }
@@ -48,10 +47,6 @@ private:
     void expr();
     void operand();
     inline bool isOperator(int t) { return (t=='<' || t=='>' || t==1000+'=' || t==1000+'<' || t==1000+'!' || t==1000+'>' || t=='+' || t=='-' || t=='*' || t=='/'); }
-
-
-
-
 public:
     Parser() : line(1), pos(1) {}
     ~Parser() {}
