@@ -8,7 +8,8 @@ int func(int i)
     if(global)
     {
         int i;
-        i = i+1;
+        double j;
+        i = array[1]+1;
     }
     return i+1;
 }
@@ -18,14 +19,14 @@ double c, d;
 
 void main()
 {
-    if(a == 4)
+    if(c == 4)
     {
-        a = a+1;
-        b = ((-a +- 13)*10/4) <= 5 >10 +2;
+        c = a[1]+1;
+        d = ((-a[2] +- 13)*10/4) <= 5 >10 +2;
     }
     else
     {
-        a = a - 1;
+        a[0] = a[1] - 1;
     }
     int index;
     index = 0;

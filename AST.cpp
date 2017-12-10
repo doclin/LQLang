@@ -212,7 +212,7 @@ bool AST::addOperator(int op)
     return true;
 }
 
-bool AST::addVarVal(const char* name, size_t nameLength, int arrIndex=-1, bool negativeFlag=false)
+bool AST::addVarVal(const char* name, size_t nameLength, int arrIndex, bool negativeFlag)
 {
     size_t tmpID;
     int tmpTF;
