@@ -50,7 +50,7 @@ private:
 public:
     Parser() : line(1), pos(1) {}
     ~Parser() {}
-    void parse(const char* c);
+    const AST& parse(const char* c);
 };
 
 

@@ -83,11 +83,10 @@ TODO：
 LLVM      1day
 
 
-名字查找
-非法语句：
-break
-return
-类型检查
+类型检查：
+函数调用
+expr类型
+void函数返回
 
 
 

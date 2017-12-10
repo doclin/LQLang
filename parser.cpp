@@ -1,11 +1,11 @@
 #include "parser.h"
 #include <iostream>
 
-void Parser::parse(const char* c)
+const AST& Parser::parse(const char* c)
 {
     code = c;
     if(code == NULL)
-        return;
+        return tree;
     crtToken = getNextToken();
     try{
         program();
@@ -14,6 +14,7 @@ void Parser::parse(const char* c)
     {
         std::cout << "GG:" << i << std::endl;
     }
+    return tree;
 }
 
 void Parser::program()
@@ -239,7 +240,7 @@ void Parser::varStmt()
     if(crtToken==INTK || crtToken==DOUBLEK)
     {
         int typeFlag;
-        size_t arrLength;
+        size_t arrLength = 0;
         if(crtToken==INTK)
             typeFlag = TINT;
         else
@@ -423,26 +424,12 @@ void Parser::parameters()
     if(crtToken==INTK || crtToken==DOUBLEK)
     {
         int typeFlag;
-        size_t arrLength;
+        size_t arrLength = 0;
         if(crtToken==INTK)
             typeFlag = TINT;
         else
             typeFlag = TDOUBLE;
         crtToken = getNextToken();
-        if(crtToken=='[')
-        {
-            if(getNextToken()==INTVALUE && getNextToken()==']')
-            {
-                if(typeFlag==TINT)
-                    typeFlag = TINTARR;
-                else
-                    typeFlag = TDOUBLEARR;
-                arrLength = INTVALUE;
-                crtToken = getNextToken();
-            }
-            else
-                throw line;
-        }
         if(crtToken == IDK)
         {
             if(!tree.addVariable(IDValue, IDLength, typeFlag, arrLength))
