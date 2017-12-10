@@ -1,6 +1,6 @@
 
-int[3] array, r;
-int global, d;
+int[3] array;
+int global;
 int i;
 
 int func(int i)
@@ -27,15 +27,13 @@ void main()
     {
         a = a - 1;
     }
-    print(a);
     int index;
     index = 0;
-    while(true)
+    while(1)
     {
         index = index + 1;
         if(index >= 100)
         {
-            print(index);
             break; 
         }
     }
