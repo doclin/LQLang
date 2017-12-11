@@ -160,6 +160,7 @@ private:
     bool breakFlag;
 public:
     AST() : root(NULL), crtNode(NULL), IDCount(0), breakFlag(false) {}
+    ASTNode* getRoot() { return root; }
     bool addRoot();
     bool addFuncDef(const char* name, size_t nameLength, int typeFlag);
     bool endFuncDef();
@@ -186,8 +187,6 @@ public:
     bool addInt(int value, bool negativeFlag=false);
     bool addDouble(double value, bool negativeFlag=false);
     ~AST() {}
-
-    void test();
 };
 
 
