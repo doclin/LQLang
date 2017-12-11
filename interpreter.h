@@ -33,6 +33,7 @@ private:
 
     void translateIR();
     void translateLclStmts(ASTNode* n, int& local);
+    void translateCall(ASTNode* n);
     void translateExpr(ASTNode* n);
 
 
