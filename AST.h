@@ -10,7 +10,7 @@ class ASTNode
 {
 public:
     enum { VARNODE=1, FUNCNODE, CALLNODE, ASSIGNNODE, IFNODE, WHILENODE, BREAKNODE, RETURNNODE, EXPRNODE, INTNODE, DOUBLENODE, VARVALNODE, OPERATORNODE };
-    enum { TVOID=0, TINT, TDOUBLE, TINTARR, TDOUBLEARR, TFUNCINT, TFUNCDOUBLE };
+    enum { TVOID=0, TINT, TDOUBLE, TINTARR, TDOUBLEARR, TFUNCVOID, TFUNCINT, TFUNCDOUBLE };
     int nodeType;
     ASTNode* next;
     ASTNode() {}
@@ -36,8 +36,9 @@ public:
     int retType;
     ASTNode* params;
     ASTNode* lclStmts;
+    int paramNum;
     FuncNode() : ASTNode::ASTNode() {}
-    FuncNode(size_t n, int rt) : ASTNode::ASTNode(FUNCNODE), name(n), retType(rt), params(NULL), lclStmts(NULL) {}
+    FuncNode(size_t n, int rt, int p=0) : ASTNode::ASTNode(FUNCNODE), name(n), retType(rt), params(NULL), lclStmts(NULL), paramNum(p) {}
     virtual ~FuncNode() {}
 };
 
@@ -47,8 +48,9 @@ public:
     bool negativeFlag;
     size_t name;
     ASTNode* args;
+    int retType;
     CallNode() : ASTNode::ASTNode() {}
-    CallNode(size_t n, bool f=false) : ASTNode::ASTNode(CALLNODE), name(n), args(NULL), negativeFlag(f) {}
+    CallNode(size_t n, int rt, bool f=false) : ASTNode::ASTNode(CALLNODE), name(n), retType(rt), args(NULL), negativeFlag(f) {}
     virtual ~CallNode() {}
 };
 
@@ -58,8 +60,9 @@ public:
     size_t name;
     int arrIndex;
     ASTNode* value;
+    int varType;
     AssignNode() : ASTNode::ASTNode() {}
-    AssignNode(size_t n, int i=-1) : ASTNode::ASTNode(ASSIGNNODE), name(n), arrIndex(i), value(NULL) {}
+    AssignNode(size_t n, int vt, int i=-1) : ASTNode::ASTNode(ASSIGNNODE), name(n), varType(vt), arrIndex(i), value(NULL) {}
     virtual ~AssignNode() {}
 };
 
@@ -101,7 +104,8 @@ class ExprNode : public ASTNode
 {
 public:
     ASTNode* value;
-    ExprNode() : ASTNode::ASTNode(EXPRNODE), value(NULL) {}
+    int varType;
+    ExprNode() : ASTNode::ASTNode(EXPRNODE), value(NULL), varType(0) {}
     virtual ~ExprNode() {}
 };
 
@@ -131,8 +135,9 @@ public:
     bool negativeFlag;
     size_t name;
     int arrIndex;
+    int varType;
     VarValNode() : ASTNode::ASTNode() {}
-    VarValNode(size_t n, int i=-1, bool f=false) : ASTNode::ASTNode(VARVALNODE), name(n), arrIndex(i), negativeFlag(f) {}
+    VarValNode(size_t n, int vt, int i=-1, bool f=false) : ASTNode::ASTNode(VARVALNODE), name(n), varType(vt), arrIndex(i), negativeFlag(f) {}
     virtual ~VarValNode() {}    
 };
 
@@ -151,7 +156,7 @@ class AST
 {
 private:
     enum { VARNODE=1, FUNCNODE, CALLNODE, ASSIGNNODE, IFNODE, WHILENODE, BREAKNODE, RETURNNODE, EXPRNODE, INTNODE, DOUBLENODE, VARVALNODE, OPERATORNODE };
-    enum { TVOID=0, TINT, TDOUBLE, TINTARR, TDOUBLEARR, TFUNCINT, TFUNCDOUBLE };
+    enum { TVOID=0, TINT, TDOUBLE, TINTARR, TDOUBLEARR, TFUNCVOID, TFUNCINT, TFUNCDOUBLE };
     SymbolTable table;
     ASTNode* root;
     ASTNode** crtNode;

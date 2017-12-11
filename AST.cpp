@@ -10,7 +10,7 @@ bool AST::addRoot()
 
 bool AST::addFuncDef(const char* name, size_t nameLength, int typeFlag)
 {
-    if(!table.addName(name, nameLength, IDCount, typeFlag+4))
+    if(!table.addName(name, nameLength, IDCount, typeFlag+5))
         return false;
     *crtNode = new FuncNode(IDCount, typeFlag);
     stk.push(*crtNode);
@@ -24,6 +24,10 @@ bool AST::endFuncDef()
 {
     if(stk.top()->nodeType != FUNCNODE)
         return false;
+    int i = 0;
+    for(ASTNode* n=static_cast<FuncNode*>(stk.top())->params; n!=NULL; n=n->next)
+        i++;
+    static_cast<FuncNode*>(stk.top())->paramNum = i;
     crtNode = &(stk.top()->next);
     stk.pop();
     table.popScope();
@@ -54,9 +58,9 @@ bool AST::addFuncCall(const char* name, size_t nameLength, bool negativeFlag)
     int tmpTF;
     if(!table.findName(name, nameLength, tmpID, tmpTF))
         return false;
-    if(tmpTF!=TFUNCINT && tmpTF!=TFUNCDOUBLE)
+    if(tmpTF!=TFUNCINT && tmpTF!=TFUNCDOUBLE && tmpTF!=TFUNCVOID)
         return false;
-    *crtNode = new CallNode(tmpID, negativeFlag);
+    *crtNode = new CallNode(tmpID, tmpTF-5, negativeFlag);
     stk.push(*crtNode);
     crtNode = &static_cast<CallNode*>(*crtNode)->args;
     return true;
@@ -77,11 +81,15 @@ bool AST::addAssign(const char* name, size_t nameLength, int arrIndex)
     int tmpTF;
     if(!table.findName(name, nameLength, tmpID, tmpTF))
         return false;
+    if(tmpTF==TFUNCDOUBLE || tmpTF==TFUNCINT || tmpTF==TFUNCVOID)
+        return false;
     if(arrIndex==-1 && (tmpTF==TINTARR || tmpTF==TDOUBLEARR))
         return false;
     if(arrIndex>=0 && (tmpTF==TINT || tmpTF==TDOUBLE))
         return false;
-    *crtNode = new AssignNode(tmpID, arrIndex);
+    if(tmpTF==TINTARR || tmpTF==TDOUBLEARR)
+        tmpTF = tmpTF - 2;
+    *crtNode = new AssignNode(tmpID, tmpTF, arrIndex);
     stk.push(*crtNode);
     crtNode = &static_cast<AssignNode*>(*crtNode)->value;
     return true;
@@ -108,6 +116,8 @@ bool AST::endAssign()
 {
     if(stk.top()->nodeType != ASSIGNNODE)
         return false;
+    //if(static_cast<AssignNode*>(stk.top())->varType != static_cast<ExprNode*>(static_cast<AssignNode*>(stk.top())->value)->varType)
+        //return false;
     crtNode = &stk.top()->next;
     stk.pop();
     return true;
@@ -218,11 +228,15 @@ bool AST::addVarVal(const char* name, size_t nameLength, int arrIndex, bool nega
     int tmpTF;
     if(!table.findName(name, nameLength, tmpID, tmpTF))
         return false;
+    if(tmpTF==TFUNCDOUBLE || tmpTF==TFUNCINT || tmpTF==TFUNCVOID)
+        return false;
     if(arrIndex==-1 && (tmpTF==TINTARR || tmpTF==TDOUBLEARR))
         return false;
     if(arrIndex>=0 && (tmpTF==TINT || tmpTF==TDOUBLE))
         return false;
-    *crtNode = new VarValNode(tmpID, arrIndex, negativeFlag);
+    if(tmpTF==TINTARR || tmpTF==TDOUBLEARR)
+        tmpTF = tmpTF - 2;
+    *crtNode = new VarValNode(tmpID, tmpTF, arrIndex, negativeFlag);
     crtNode = &(*crtNode) -> next;
     return true;
 }

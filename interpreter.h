@@ -8,8 +8,8 @@ class Interpreter
 {
 private:
     enum { VARNODE=1, FUNCNODE, CALLNODE, ASSIGNNODE, IFNODE, WHILENODE, BREAKNODE, RETURNNODE, EXPRNODE, INTNODE, DOUBLENODE, VARVALNODE, OPERATORNODE };
-    enum { TVOID=0, TINT, TDOUBLE, TINTARR, TDOUBLEARR, TFUNCINT, TFUNCDOUBLE };
-    enum { IALLOC, DALLOC, IAALLOC, DAALLOC };
+    enum { TVOID=0, TINT, TDOUBLE, TINTARR, TDOUBLEARR, TFUNCVOID, TFUNCINT, TFUNCDOUBLE };
+    //enum { IALLOC, DALLOC, IAALLOC, DAALLOC };
     ASTNode* root;
     union IRType
     {
@@ -32,6 +32,10 @@ private:
 
 
     void translateIR();
+    void translateLclStmts(ASTNode* n, int& local);
+    void translateExpr(ASTNode* n);
+
+
 public:
     Interpreter() {}
     int exec(AST& tree);
