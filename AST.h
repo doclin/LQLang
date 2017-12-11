@@ -186,6 +186,8 @@ public:
     bool addInt(int value, bool negativeFlag=false);
     bool addDouble(double value, bool negativeFlag=false);
     ~AST() {}
+
+    void test();
 };
 
 
