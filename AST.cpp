@@ -107,6 +107,25 @@ bool AST::endExpr()
 {
     if(stk.top()->nodeType != EXPRNODE)
         return false;
+    ASTNode* operandList = &ASTNode();
+    ASTNode* crtOperand = operandList;
+    ASTNode* operatorList = &ASTNode();
+    ASTNode* crtOperator = operatorList;
+    for(ASTNode* origin = static_cast<ExprNode*>(stk.top())->value; origin != NULL; origin = origin->next)
+    {
+        if(origin->nodeType==CALLNODE && static_cast<CallNode*>(origin)->retType==TVOID)
+            return false;
+        if(origin->nodeType==INTNODE || origin->nodeType==DOUBLENODE || origin->nodeType==CALLNODE || origin->nodeType==VARVALNODE)
+        {
+            crtOperand -> next = origin;
+            crtOperand = crtOperand -> next;
+        }
+        else
+
+    }
+
+
+
     crtNode = &stk.top()->next;
     stk.pop();
     return true;
@@ -116,8 +135,6 @@ bool AST::endAssign()
 {
     if(stk.top()->nodeType != ASSIGNNODE)
         return false;
-    //if(static_cast<AssignNode*>(stk.top())->varType != static_cast<ExprNode*>(static_cast<AssignNode*>(stk.top())->value)->varType)
-        //return false;
     crtNode = &stk.top()->next;
     stk.pop();
     return true;

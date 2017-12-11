@@ -44,14 +44,7 @@ by whu Doclin
 <expr4>             ::= (<expr>) | <value> | ID(<argList>) | INT | DOUBLE 
 ```
 
-采用C-style作用域
-语法最后改
 
-
-
-数组为引用类型，使用iarray,darray分配
-
-全局符号表包括全局数据和函数入口地址
 
 栈顶esp，栈基ebp
 函数调用先压
@@ -60,33 +53,12 @@ return
 移动esp
 返回值
 
-指令粒度
 
-解决回溯语法
-拿纸画
-构建AST，确定权责
-
-parser简单对象
-符号表封装类，单例模式
-IR封装类
-
-参考龙书：
-语法树
-符号表
-寄存器分配
-
-TODO：
-语法树
-解释器IR
-解释执行IR
-并行化     1day
-LLVM      1day
 
 
 类型检查：
 函数调用参数
 expr类型
-void函数返回类型
 void加return
 内置函数
 
@@ -99,22 +71,5 @@ varval放栈顶
 
 
 
-
-运行时：
-计算栈能区分类型
-
-
-
-
-iload       index
-dload       index
-istore      index
-dstore      index
-istoren     int
-dstoren     double
-iconst      int
-dconst      double
-iarray      size
-darray      size
-if          code
-jump        code
+析构
+异常

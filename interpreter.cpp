@@ -31,7 +31,7 @@ void Interpreter::translateIR()
         }
         else if(n->nodeType == FUNCNODE)
         {
-            size_t name = static_cast<VarNode*>(n)->name;
+            size_t name = static_cast<FuncNode*>(n)->name;
             addressTable.insert(std::pair<size_t, std::pair<int, bool> >(name, std::pair<int, bool>(IR.size(), true)));
             instruction.opcode = PUSHEBP;
             IR.push_back(instruction);
@@ -83,6 +83,105 @@ void Interpreter::translateLclStmts(ASTNode* n, int& local)
         }
         else if(n->nodeType == CALLNODE)
             translateCall(n);
+        else if(n->nodeType == ASSIGNNODE)
+        {
+            size_t name = static_cast<AssignNode*>(n)->name;
+            int varType = static_cast<AssignNode*>(n)->varType;
+            int arrIndex = static_cast<AssignNode*>(n)->arrIndex;
+            std::pair<int, bool> result = addressTable.find(static_cast<AssignNode*>(n)->name)->second;
+            int address = result.first;
+            bool global = result.second;            
+            translateExpr(static_cast<AssignNode*>(n)->value);
+            int exprType = static_cast<ExprNode*>(static_cast<AssignNode*>(n)->value)->varType;
+            if(varType==TINT && exprType==TDOUBLE)
+            {
+                instruction.opcode = DTOI;
+                IR.push_back(instruction);
+            }
+            else if(varType==TDOUBLE && exprType==TINT)
+            {
+                instruction.opcode = ITOD;
+                IR.push_back(instruction);
+            }
+            if(varType==TINT)
+            {
+                if(arrIndex == -1)
+                {
+                    if(global)
+                    {
+                        instruction.opcode = IGSTORE;
+                        IR.push_back(instruction);
+                        instruction.opcode = address;
+                        IR.push_back(instruction);
+                    }
+                    else
+                    {
+                        instruction.opcode = ILSTORE;
+                        IR.push_back(instruction);
+                        instruction.iValue = address;
+                        IR.push_back(instruction);
+                    }
+                }
+                else
+                {
+                    if(global)
+                    {
+                        instruction.opcode = IGSTORE;
+                        IR.push_back(instruction);
+                        instruction.opcode = address + arrIndex;
+                        IR.push_back(instruction);
+                    }
+                    else
+                    {
+                        instruction.opcode = ILSTORE;
+                        IR.push_back(instruction);
+                        instruction.iValue = address + arrIndex;
+                        IR.push_back(instruction);
+                    }
+                }
+            }
+            else
+            {
+                if(arrIndex == -1)
+                {
+                    if(global)
+                    {
+                        instruction.opcode = DGSTORE;
+                        IR.push_back(instruction);
+                        instruction.opcode = address;
+                        IR.push_back(instruction);
+                    }
+                    else
+                    {
+                        instruction.opcode = DLSTORE;
+                        IR.push_back(instruction);
+                        instruction.iValue = address;
+                        IR.push_back(instruction);
+                    }
+                }
+                else
+                {
+                    if(global)
+                    {
+                        instruction.opcode = DGSTORE;
+                        IR.push_back(instruction);
+                        instruction.opcode = address + arrIndex;
+                        IR.push_back(instruction);
+                    }
+                    else
+                    {
+                        instruction.opcode = DLSTORE;
+                        IR.push_back(instruction);
+                        instruction.iValue = address + arrIndex;
+                        IR.push_back(instruction);
+                    }
+                }
+            }
+        }
+        else if(n->nodeType == IFNODE)
+        {
+            ;
+        }
     }
 }
 
@@ -151,7 +250,131 @@ void Interpreter::translateExpr(ASTNode* n)
             }
         }
         else if(node->nodeType == VARVALNODE)
-            ;
+        {
+            int typeFlag = static_cast<VarValNode*>(node)->varType;
+            bool negativeFlag = static_cast<VarValNode*>(node)->negativeFlag;
+            int arrIndex = static_cast<VarValNode*>(node)->arrIndex;
+            std::pair<int, bool> result = addressTable.find(static_cast<VarValNode*>(n)->name)->second;
+            int address = result.first;
+            bool global = result.second;
+            if(typeFlag==TINT)
+            {
+                if(arrIndex == -1)
+                {
+                    if(global)
+                    {
+                        instruction.opcode = IGLOAD;
+                        IR.push_back(instruction);
+                        instruction.opcode = address;
+                        IR.push_back(instruction);
+                    }
+                    else
+                    {
+                        instruction.opcode = ILLOAD;
+                        IR.push_back(instruction);
+                        instruction.iValue = address;
+                        IR.push_back(instruction);
+                    }
+                }
+                else
+                {
+                    if(global)
+                    {
+                        instruction.opcode = IGLOAD;
+                        IR.push_back(instruction);
+                        instruction.opcode = address + arrIndex;
+                        IR.push_back(instruction);
+                    }
+                    else
+                    {
+                        instruction.opcode = ILLOAD;
+                        IR.push_back(instruction);
+                        instruction.iValue = address + arrIndex;
+                        IR.push_back(instruction);
+                    }
+                }
+                if(negativeFlag)
+                {
+                    instruction.opcode = INEGATIVE;
+                    IR.push_back(instruction);
+                }
+            }
+            else
+            {
+                if(arrIndex == -1)
+                {
+                    if(global)
+                    {
+                        instruction.opcode = DGLOAD;
+                        IR.push_back(instruction);
+                        instruction.opcode = address;
+                        IR.push_back(instruction);
+                    }
+                    else
+                    {
+                        instruction.opcode = DLLOAD;
+                        IR.push_back(instruction);
+                        instruction.iValue = address;
+                        IR.push_back(instruction);
+                    }
+                }
+                else
+                {
+                    if(global)
+                    {
+                        instruction.opcode = DGLOAD;
+                        IR.push_back(instruction);
+                        instruction.opcode = address + arrIndex;
+                        IR.push_back(instruction);
+                    }
+                    else
+                    {
+                        instruction.opcode = DLLOAD;
+                        IR.push_back(instruction);
+                        instruction.iValue = address + arrIndex;
+                        IR.push_back(instruction);
+                    }
+                }
+                if(negativeFlag)
+                {
+                    instruction.opcode = DNEGATIVE;
+                    IR.push_back(instruction);
+                }
+            }
+        }
+        else if(node->nodeType == INTNODE)
+        {
+            int value = static_cast<IntNode*>(node)->value;
+            bool negativeFlag = static_cast<IntNode*>(node)->negativeFlag;
+            instruction.opcode = ICONST;
+            IR.push_back(instruction);
+            instruction.iValue = value;
+            IR.push_back(instruction);
+            if(negativeFlag)
+            {
+                instruction.opcode = INEGATIVE;
+                IR.push_back(instruction);
+            }
+        }
+        else if(node->nodeType == DOUBLENODE)
+        {
+            double value = static_cast<DoubleNode*>(node)->value;
+            bool negativeFlag = static_cast<DoubleNode*>(node)->negativeFlag;
+            instruction.opcode = DCONST;
+            IR.push_back(instruction);
+            instruction.dValue = value;
+            IR.push_back(instruction);
+            if(negativeFlag)
+            {
+                instruction.opcode = DNEGATIVE;
+                IR.push_back(instruction);
+            }            
+        }
+        else if(node->nodeType == OPERATORNODE)
+        {
+            int op = static_cast<OperatorNode*>(node)->op;
+
+        }
     }
 }
 

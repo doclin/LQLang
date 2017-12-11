@@ -19,7 +19,6 @@ private:
     } instruction;
     std::map<size_t, std::pair<int, bool> > addressTable;
     std::vector<IRType> IR;
-    size_t globalAddress;
 
     union MemType
     {
