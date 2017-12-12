@@ -576,6 +576,233 @@ void Interpreter::translateExpr(ASTNode* n)
 
 void Interpreter::exec()
 {
-    ;
+    using namespace std;
+
+    ebp = memory.size();
+    while(ipx < IR.size())
+    {
+        if(IR[ipx].opcode == PUSHEBP)
+        {
+            cout << ipx++ << " PUSHEBP" << endl;
+        }
+        else if(IR[ipx].opcode == NEWEBP)
+        {
+            cout << ipx++ << " NEWEBP" << endl;
+        }
+        else if(IR[ipx].opcode == MALLOC)
+        {
+            cout << ipx++ << " MALLOC" << endl;
+        }        
+        else if(IR[ipx].opcode == MALLOCARR)
+        {
+            cout << ipx++ << " MALLOCARR" << endl;
+            cout << ipx++ << IR[ipx].opcode << endl;
+        }
+        else if(IR[ipx].opcode == DTOI)
+        {
+            cout << ipx++ << " DTOI" << endl;
+        }
+        else if(IR[ipx].opcode == ITOD)
+        {
+            cout << ipx++ << " ITOD" << endl;
+        }
+        else if(IR[ipx].opcode == IGSTORE)
+        {
+            cout << ipx++ << " IGSTORE" << endl;
+            cout << ipx++ << IR[ipx].opcode << endl;
+        }        
+        else if(IR[ipx].opcode == ILSTORE)
+        {
+            cout << ipx++ << " ILSTORE" << endl;
+            cout << ipx++ << IR[ipx].iValue << endl;
+        }
+        else if(IR[ipx].opcode == DGSTORE)
+        {
+            cout << ipx++ << " DGSTORE" << endl;
+            cout << ipx++ << IR[ipx].opcode << endl;
+        }
+        else if(IR[ipx].opcode == DLSTORE)
+        {
+            cout << ipx++ << " DLSTORE" << endl;
+            cout << ipx++ << IR[ipx].iValue << endl;            
+        }
+        else if(IR[ipx].opcode == IFCMP)
+        {
+            cout << ipx++ << " IFCMP" << endl;
+            cout << ipx++ << IR[ipx].opcode << endl;
+        }        
+        else if(IR[ipx].opcode == IFNCMP)
+        {
+            cout << ipx++ << " IFNCMP" << endl;
+            cout << ipx++ << IR[ipx].opcode << endl;
+        }
+        else if(IR[ipx].opcode == JUMP)
+        {
+            cout << ipx++ << " JUMP" << endl;
+            cout << ipx++ << IR[ipx].opcode << endl;
+        }
+        else if(IR[ipx].opcode == JUMPBACK)
+        {
+            cout << ipx++ << " JUMPBACK" << endl;
+        }
+        else if(IR[ipx].opcode == IRETURN)
+        {
+            cout << ipx++ << " IRETURN" << endl;
+        }        
+        else if(IR[ipx].opcode == DRETURN)
+        {
+            cout << ipx++ << " DRETURN" << endl;
+        }
+        else if(IR[ipx].opcode == ISTORETOP)
+        {
+            cout << ipx++ << " ISTORETOP" << endl;
+        }
+        else if(IR[ipx].opcode == DSTORETOP)
+        {
+            cout << ipx++ << " DSTORETOP" << endl;
+        }
+        else if(IR[ipx].opcode == PUSHADRS)
+        {
+            cout << ipx++ << " PUSHADRS" << endl;
+        }        
+        else if(IR[ipx].opcode == OLDEBP)
+        {
+            cout << ipx++ << " OLDEBP" << endl;
+        }
+        else if(IR[ipx].opcode == OLDESP)
+        {
+            cout << ipx++ << " OLDESP" << endl;
+        }
+        else if(IR[ipx].opcode == IRESULT)
+        {
+            cout << ipx++ << " IRESULT" << endl;        
+        }
+        else if(IR[ipx].opcode == INEGATIVE)
+        {
+            cout << ipx++ << " INEGATIVE" << endl;
+        }        
+        else if(IR[ipx].opcode == DRESULT)
+        {
+            cout << ipx++ << " DRESULT" << endl;
+        }
+        else if(IR[ipx].opcode == DNEGATIVE)
+        {
+            cout << ipx++ << " DNEGATIVE" << endl;
+        }
+        else if(IR[ipx].opcode == IGLOAD)
+        {
+            cout << ipx++ << " IGLOAD" << endl;
+            cout << ipx++ << IR[ipx].opcode << endl;
+        }
+        else if(IR[ipx].opcode == ILLOAD)
+        {
+            cout << ipx++ << " ILLOAD" << endl;
+            cout << ipx++ << IR[ipx].iValue << endl;
+        }        
+        else if(IR[ipx].opcode == DGLOAD)
+        {
+            cout << ipx++ << " DGLOAD" << endl;
+            cout << ipx++ << IR[ipx].opcode << endl;
+        }
+        else if(IR[ipx].opcode == DLLOAD)
+        {
+            cout << ipx++ << " DLLOAD" << endl;
+            cout << ipx++ << IR[ipx].iValue << endl;
+        }
+        else if(IR[ipx].opcode == ICONST)
+        {
+            cout << ipx++ << " ICONST" << endl;
+            cout << ipx++ << IR[ipx].iValue << endl;
+        }
+        else if(IR[ipx].opcode == DCONST)
+        {
+            cout << ipx++ << " DCONST" << endl;
+            cout << ipx++ << IR[ipx].dValue << endl;
+        }        
+        else if(IR[ipx].opcode == ITOD2)
+        {
+            cout << ipx++ << " ITOD2" << endl;
+        }
+        else if(IR[ipx].opcode == IADD)
+        {
+            cout << ipx++ << " IADD" << endl;
+        }
+        else if(IR[ipx].opcode == DADD)
+        {
+            cout << ipx++ << " DADD" << endl;        
+        }
+        else if(IR[ipx].opcode == ISUB)
+        {
+            cout << ipx++ << " ISUB" << endl;
+        }        
+        else if(IR[ipx].opcode == DSUB)
+        {
+            cout << ipx++ << " DSUB" << endl;
+        }
+        else if(IR[ipx].opcode == IMUL)
+        {
+            cout << ipx++ << " IMUL" << endl;
+        }
+        else if(IR[ipx].opcode == DMUL)
+        {
+            cout << ipx++ << " DMUL" << endl;
+        }
+        else if(IR[ipx].opcode == IDIV)
+        {
+            cout << ipx++ << " IDIV" << endl;
+        }        
+        else if(IR[ipx].opcode == DDIV)
+        {
+            cout << ipx++ << " DDIV" << endl;
+        }
+        else if(IR[ipx].opcode == ISML)
+        {
+            cout << ipx++ << " ISML" << endl;
+        }
+        else if(IR[ipx].opcode == DSML)
+        {
+            cout << ipx++ << " DSML" << endl;
+        }
+        else if(IR[ipx].opcode == IBIG)
+        {
+            cout << ipx++ << " IBIG" << endl;
+        }        
+        else if(IR[ipx].opcode == DBIG)
+        {
+            cout << ipx++ << " DBIG" << endl;
+        }
+        else if(IR[ipx].opcode == ISMLEQL)
+        {
+            cout << ipx++ << " ISMLEQL" << endl;        
+        }
+        else if(IR[ipx].opcode == DSMLEQL)
+        {
+            cout << ipx++ << " DSMLEQL" << endl;
+        }        
+        else if(IR[ipx].opcode == IEQLEQL)
+        {
+            cout << ipx++ << " IEQLEQL" << endl;
+        }
+        else if(IR[ipx].opcode == DEQLEQL)
+        {
+            cout << ipx++ << " DEQLEQL" << endl;
+        }
+        else if(IR[ipx].opcode == IBIGEQL)
+        {
+            cout << ipx++ << " IBIGEQL" << endl;
+        }
+        else if(IR[ipx].opcode == DBIGEQL)
+        {
+            cout << ipx++ << " DBIGEQL" << endl;
+        }        
+        else if(IR[ipx].opcode == INOTEQL)
+        {
+            cout << ipx++ << " INOTEQL" << endl;
+        }
+        else if(IR[ipx].opcode == DNOTEQL)
+        {
+            cout << ipx++ << " DNOTEQL" << endl;
+        }
+    }
 
 }

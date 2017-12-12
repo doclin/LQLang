@@ -30,6 +30,10 @@ private:
         double dValue;
         int iValue;
     } data;
+    int irx;
+    double drx;
+    size_t ipx;
+    size_t ebp;
     std::vector<MemType> memory;
 
     void translateIR();
@@ -37,7 +41,7 @@ private:
     void translateCall(ASTNode* n);
     void translateExpr(ASTNode* n);
 public:
-    Interpreter() {}
+    Interpreter() : root(NULL), ipx(0), ebp(0) {}
     void interpret(AST& tree);
     void exec();
     ~Interpreter() {}
