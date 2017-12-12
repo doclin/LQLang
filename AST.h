@@ -45,10 +45,10 @@ public:
 class CallNode : public ASTNode
 {
 public:
-    bool negativeFlag;
     size_t name;
-    ASTNode* args;
     int retType;
+    ASTNode* args;
+    bool negativeFlag;
     CallNode() : ASTNode::ASTNode() {}
     CallNode(size_t n, int rt, bool f=false) : ASTNode::ASTNode(CALLNODE), name(n), retType(rt), args(NULL), negativeFlag(f) {}
     virtual ~CallNode() {}
@@ -58,9 +58,9 @@ class AssignNode : public ASTNode
 {
 public:
     size_t name;
+    int varType;
     int arrIndex;
     ASTNode* value;
-    int varType;
     AssignNode() : ASTNode::ASTNode() {}
     AssignNode(size_t n, int vt, int i=-1) : ASTNode::ASTNode(ASSIGNNODE), name(n), varType(vt), arrIndex(i), value(NULL) {}
     virtual ~AssignNode() {}
@@ -112,8 +112,8 @@ public:
 class IntNode : public ASTNode
 {
 public:
-    bool negativeFlag;
     int value;
+    bool negativeFlag;
     IntNode() : ASTNode::ASTNode() {}
     IntNode(int v, bool f=false) : ASTNode::ASTNode(INTNODE), value(v), negativeFlag(f) {}
     virtual ~IntNode() {}
@@ -122,8 +122,8 @@ public:
 class DoubleNode : public ASTNode
 {
 public:
-    bool negativeFlag;
     double value;
+    bool negativeFlag;
     DoubleNode() : ASTNode::ASTNode() {}
     DoubleNode(double v, bool f=false) : ASTNode::ASTNode(DOUBLENODE), value(v), negativeFlag(f) {}
     virtual ~DoubleNode() {}
@@ -132,10 +132,10 @@ public:
 class VarValNode : public ASTNode
 {
 public:
-    bool negativeFlag;
     size_t name;
-    int arrIndex;
     int varType;
+    int arrIndex;
+    bool negativeFlag;
     VarValNode() : ASTNode::ASTNode() {}
     VarValNode(size_t n, int vt, int i=-1, bool f=false) : ASTNode::ASTNode(VARVALNODE), name(n), varType(vt), arrIndex(i), negativeFlag(f) {}
     virtual ~VarValNode() {}    

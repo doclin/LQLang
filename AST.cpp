@@ -109,7 +109,7 @@ bool AST::endExpr()
     if(stk.top()->nodeType != EXPRNODE)
         return false;
 
-    ASTNode* operandList = &ASTNode();
+    ASTNode* operandList = new ASTNode();
     ASTNode* crtOperand = operandList;
     std::stack<OperatorNode*> operatorStack;
     for(ASTNode* origin = static_cast<ExprNode*>(stk.top())->value; origin != NULL; origin = origin->next)
@@ -158,6 +158,7 @@ bool AST::endExpr()
         crtOperand = crtOperand -> next;
         operatorStack.pop();       
     }
+    crtOperand -> next = NULL;
     static_cast<ExprNode*>(stk.top())->value = operandList -> next;
 
     crtNode = &stk.top()->next;
@@ -183,6 +184,8 @@ int AST::getLevel(OperatorNode* node)
         return 4;
     else if(op==')')
         return 0;
+    else
+        return -1;
 }
 
 bool AST::endAssign()

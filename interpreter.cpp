@@ -1,6 +1,8 @@
 #include "interpreter.h"
 
 
+using namespace std;
+
 
 void Interpreter::interpret(AST& tree)
 {
@@ -43,7 +45,6 @@ void Interpreter::translateIR()
             int local = 1;
             for(ASTNode* no=static_cast<FuncNode*>(n)->params; no!=NULL; no=no->next)
             {
-                int varType = static_cast<VarNode*>(no)->varType;
                 size_t name = static_cast<VarNode*>(no)->name;
                 addressTable.insert(std::pair<size_t, std::pair<int, bool> >(name, std::pair<int, bool>(i-paramNum, false)));
                 i++;
@@ -86,7 +87,6 @@ void Interpreter::translateLclStmts(ASTNode* n, int& local)
             translateCall(n);
         else if(n->nodeType == ASSIGNNODE)
         {
-            size_t name = static_cast<AssignNode*>(n)->name;
             int varType = static_cast<AssignNode*>(n)->varType;
             int arrIndex = static_cast<AssignNode*>(n)->arrIndex;
             std::pair<int, bool> result = addressTable.find(static_cast<AssignNode*>(n)->name)->second;
@@ -215,7 +215,7 @@ void Interpreter::translateLclStmts(ASTNode* n, int& local)
             IR[tmpAddress1].opcode = IR.size();
             while(!breakpoints.empty())
             {
-                IR[breakpoints.back].opcode = IR.size();
+                IR[breakpoints.back()].opcode = IR.size();
                 breakpoints.pop_back();
             }
         }
@@ -318,7 +318,7 @@ void Interpreter::translateExpr(ASTNode* n)
             int typeFlag = static_cast<VarValNode*>(node)->varType;
             bool negativeFlag = static_cast<VarValNode*>(node)->negativeFlag;
             int arrIndex = static_cast<VarValNode*>(node)->arrIndex;
-            std::pair<int, bool> result = addressTable.find(static_cast<VarValNode*>(n)->name)->second;
+            std::pair<int, bool> result = addressTable.find(static_cast<VarValNode*>(node)->name)->second;
             int address = result.first;
             bool global = result.second;
             if(typeFlag==TINT)
@@ -596,7 +596,7 @@ void Interpreter::exec()
         else if(IR[ipx].opcode == MALLOCARR)
         {
             cout << ipx++ << " MALLOCARR" << endl;
-            cout << ipx++ << IR[ipx].opcode << endl;
+            cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
         }
         else if(IR[ipx].opcode == DTOI)
         {
@@ -609,37 +609,37 @@ void Interpreter::exec()
         else if(IR[ipx].opcode == IGSTORE)
         {
             cout << ipx++ << " IGSTORE" << endl;
-            cout << ipx++ << IR[ipx].opcode << endl;
+            cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
         }        
         else if(IR[ipx].opcode == ILSTORE)
         {
             cout << ipx++ << " ILSTORE" << endl;
-            cout << ipx++ << IR[ipx].iValue << endl;
+            cout << ipx++ << " "; cout << IR[ipx-1].iValue << endl;
         }
         else if(IR[ipx].opcode == DGSTORE)
         {
             cout << ipx++ << " DGSTORE" << endl;
-            cout << ipx++ << IR[ipx].opcode << endl;
+            cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
         }
         else if(IR[ipx].opcode == DLSTORE)
         {
             cout << ipx++ << " DLSTORE" << endl;
-            cout << ipx++ << IR[ipx].iValue << endl;            
+            cout << ipx++ << " "; cout << IR[ipx-1].iValue << endl;            
         }
         else if(IR[ipx].opcode == IFCMP)
         {
             cout << ipx++ << " IFCMP" << endl;
-            cout << ipx++ << IR[ipx].opcode << endl;
+            cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
         }        
         else if(IR[ipx].opcode == IFNCMP)
         {
             cout << ipx++ << " IFNCMP" << endl;
-            cout << ipx++ << IR[ipx].opcode << endl;
+            cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
         }
         else if(IR[ipx].opcode == JUMP)
         {
             cout << ipx++ << " JUMP" << endl;
-            cout << ipx++ << IR[ipx].opcode << endl;
+            cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
         }
         else if(IR[ipx].opcode == JUMPBACK)
         {
@@ -692,32 +692,32 @@ void Interpreter::exec()
         else if(IR[ipx].opcode == IGLOAD)
         {
             cout << ipx++ << " IGLOAD" << endl;
-            cout << ipx++ << IR[ipx].opcode << endl;
+            cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
         }
         else if(IR[ipx].opcode == ILLOAD)
         {
             cout << ipx++ << " ILLOAD" << endl;
-            cout << ipx++ << IR[ipx].iValue << endl;
+            cout << ipx++ << " "; cout << IR[ipx-1].iValue << endl;
         }        
         else if(IR[ipx].opcode == DGLOAD)
         {
             cout << ipx++ << " DGLOAD" << endl;
-            cout << ipx++ << IR[ipx].opcode << endl;
+            cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
         }
         else if(IR[ipx].opcode == DLLOAD)
         {
             cout << ipx++ << " DLLOAD" << endl;
-            cout << ipx++ << IR[ipx].iValue << endl;
+            cout << ipx++ << " "; cout << IR[ipx-1].iValue << endl;
         }
         else if(IR[ipx].opcode == ICONST)
         {
             cout << ipx++ << " ICONST" << endl;
-            cout << ipx++ << IR[ipx].iValue << endl;
+            cout << ipx++ << " "; cout << IR[ipx-1].iValue << endl;
         }
         else if(IR[ipx].opcode == DCONST)
         {
             cout << ipx++ << " DCONST" << endl;
-            cout << ipx++ << IR[ipx].dValue << endl;
+            cout << ipx++ << " "; cout << IR[ipx-1].dValue << endl;
         }        
         else if(IR[ipx].opcode == ITOD2)
         {
