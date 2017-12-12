@@ -17,6 +17,7 @@ private:
     int integerValue;
     const char* IDValue;
     size_t IDLength;
+    bool success;
 
     AST tree;
     
@@ -48,9 +49,10 @@ private:
     void operand(bool nf);
     inline bool isOperator(int t) { return (t=='<' || t=='>' || t==1000+'=' || t==1000+'<' || t==1000+'!' || t==1000+'>' || t=='+' || t=='-' || t=='*' || t=='/'); }
 public:
-    Parser() : line(1), pos(1) {}
+    Parser() : line(1), pos(1), success(true) {}
     ~Parser() {}
     AST& parse(const char* c);
+    bool isSuccess() { return success; }
 };
 
 

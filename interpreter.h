@@ -27,6 +27,7 @@ private:
 
     union MemType
     {
+        size_t address;
         double dValue;
         int iValue;
     } data;
@@ -34,16 +35,20 @@ private:
     double drx;
     size_t ipx;
     size_t ebp;
+    size_t esp;
     std::vector<MemType> memory;
+    std::stack<MemType> stk;
 
     void translateIR();
     void translateLclStmts(ASTNode* n, int& local);
     void translateCall(ASTNode* n);
     void translateExpr(ASTNode* n);
+    void exec();    
+    void showIR();
 public:
-    Interpreter() : root(NULL), ipx(0), ebp(0) {}
+    Interpreter() : root(NULL), ipx(0), ebp(0), esp(0) {}
     void interpret(AST& tree);
-    void exec();
+    void showInterpretation(AST& tree);
     ~Interpreter() {}
 };
 

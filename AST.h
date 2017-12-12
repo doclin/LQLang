@@ -168,6 +168,7 @@ private:
 public:
     AST() : root(NULL), crtNode(NULL), IDCount(0), breakFlag(0) {}
     ASTNode* getRoot() { return root; }
+    bool checkMain();
     bool addRoot();
     bool addFuncDef(const char* name, size_t nameLength, int typeFlag);
     bool endFuncDef();

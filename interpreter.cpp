@@ -1,15 +1,49 @@
 #include "interpreter.h"
 
 
-using namespace std;
-
-
 void Interpreter::interpret(AST& tree)
 {
+    //if(!tree.checkMain())
+        //return;
     root = tree.getRoot();
     translateIR();
+
+    size_t jumpAddress = addressTable.find(0xabcdef12)->second.first;
+    instruction.opcode = PUSHADRS;
+    IR.push_back(instruction);
+    instruction.opcode = IR.size() + 3;
+    IR.push_back(instruction);
+    instruction.opcode = JUMP;
+    IR.push_back(instruction);
+    instruction.opcode = jumpAddress;
+    IR.push_back(instruction);
+
     exec();
+    std::cout << "Result:" << irx << std::endl;
 }
+
+void Interpreter::showInterpretation(AST& tree)
+{
+    //if(!tree.checkMain())
+    //    return;
+    root = tree.getRoot();
+    translateIR();
+
+    size_t jumpAddress = addressTable.find(0xabcdef12)->second.first;
+    instruction.opcode = PUSHADRS;
+    IR.push_back(instruction);
+    instruction.opcode = IR.size() + 3;
+    IR.push_back(instruction);
+    instruction.opcode = JUMP;
+    IR.push_back(instruction);
+    instruction.opcode = jumpAddress;
+    IR.push_back(instruction);
+
+    showIR();
+}
+
+
+
 
 void Interpreter::translateIR()
 {
@@ -241,6 +275,7 @@ void Interpreter::translateLclStmts(ASTNode* n, int& local)
                     instruction.opcode = IRETURN;
                 else
                     instruction.opcode = DRETURN;
+                IR.push_back(instruction);
                 instruction.opcode = JUMPBACK;
                 IR.push_back(instruction);
             }
@@ -277,7 +312,7 @@ void Interpreter::translateCall(ASTNode* n)
     IR.push_back(instruction);
     instruction.opcode = OLDESP;
     IR.push_back(instruction);
-    instruction.opcode = space + 1;
+    instruction.opcode = space;
     IR.push_back(instruction);
 }
 
@@ -574,7 +609,7 @@ void Interpreter::translateExpr(ASTNode* n)
 }
 
 
-void Interpreter::exec()
+void Interpreter::showIR()
 {
     using namespace std;
 
@@ -664,6 +699,7 @@ void Interpreter::exec()
         else if(IR[ipx].opcode == PUSHADRS)
         {
             cout << ipx++ << " PUSHADRS" << endl;
+            cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
         }        
         else if(IR[ipx].opcode == OLDEBP)
         {
@@ -672,6 +708,7 @@ void Interpreter::exec()
         else if(IR[ipx].opcode == OLDESP)
         {
             cout << ipx++ << " OLDESP" << endl;
+            cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
         }
         else if(IR[ipx].opcode == IRESULT)
         {
@@ -802,6 +839,402 @@ void Interpreter::exec()
         else if(IR[ipx].opcode == DNOTEQL)
         {
             cout << ipx++ << " DNOTEQL" << endl;
+        }
+    }
+
+}
+
+
+void Interpreter::exec()
+{
+    ipx = IR.size() - 4;
+    while(ipx < IR.size())
+    {
+        if(IR[ipx].opcode == PUSHEBP)
+        {
+            data.address = ebp;
+            memory.push_back(data);
+            ipx++;
+        }
+        else if(IR[ipx].opcode == NEWEBP)
+        {
+            ebp = memory.size() - 1;
+            ipx++;
+        }
+        else if(IR[ipx].opcode == MALLOC)
+        {
+            memory.push_back(data);
+            ipx++;
+        }        
+        else if(IR[ipx].opcode == MALLOCARR)
+        {
+            memory.resize(memory.size() + IR[ipx+1].opcode);
+            ipx += 2;
+        }
+        else if(IR[ipx].opcode == DTOI)
+        {
+            stk.top().iValue = (int)stk.top().dValue;
+            ipx++;
+        }
+        else if(IR[ipx].opcode == ITOD)
+        {
+            stk.top().dValue = (double)stk.top().iValue;
+            ipx++;
+        }
+        else if(IR[ipx].opcode == IGSTORE)
+        {
+            memory[IR[ipx+1].opcode].iValue = stk.top().iValue;
+            stk.pop();
+            ipx += 2;
+        }        
+        else if(IR[ipx].opcode == ILSTORE)
+        {
+            memory[IR[ipx+1].iValue+ebp].iValue = stk.top().iValue;
+            stk.pop();
+            ipx += 2;
+        }
+        else if(IR[ipx].opcode == DGSTORE)
+        {
+            memory[IR[ipx+1].opcode].dValue = stk.top().dValue;
+            stk.pop();
+            ipx += 2;
+        }
+        else if(IR[ipx].opcode == DLSTORE)
+        {
+            memory[IR[ipx+1].iValue+ebp].dValue = stk.top().dValue;
+            stk.pop();
+            ipx += 2;        
+        }
+        else if(IR[ipx].opcode == IFCMP)
+        {
+            if(stk.top().iValue != 0)
+                ipx = IR[ipx+1].opcode;
+            else
+                ipx += 2;
+            stk.pop();
+        }        
+        else if(IR[ipx].opcode == IFNCMP)
+        {
+            if(stk.top().iValue == 0)
+                ipx = IR[ipx+1].opcode;
+            else
+                ipx += 2;
+            stk.pop();
+        }
+        else if(IR[ipx].opcode == JUMP)
+        {
+            ipx = IR[ipx+1].opcode;
+        }
+        else if(IR[ipx].opcode == JUMPBACK)
+        {
+            ipx = memory[ebp-1].address;
+        }
+        else if(IR[ipx].opcode == IRETURN)
+        {
+            irx = stk.top().iValue;
+            stk.pop();
+            ipx++;
+        }        
+        else if(IR[ipx].opcode == DRETURN)
+        {
+            drx = stk.top().dValue;
+            stk.pop();
+            ipx++;
+        }
+        else if(IR[ipx].opcode == ISTORETOP)
+        {
+            memory[memory.size()-1].iValue = stk.top().iValue;
+            stk.pop();
+            ipx++;
+        }
+        else if(IR[ipx].opcode == DSTORETOP)
+        {
+            memory[memory.size()-1].dValue = stk.top().dValue;
+            stk.pop();
+            ipx++;
+        }
+        else if(IR[ipx].opcode == PUSHADRS)
+        {
+            esp = memory.size();
+            data.address = IR[ipx+1].opcode;
+            memory.push_back(data);
+            ipx += 2;
+        }        
+        else if(IR[ipx].opcode == OLDEBP)
+        {
+            ebp = memory[ebp].address;
+            ipx++;
+        }
+        else if(IR[ipx].opcode == OLDESP)
+        {
+            memory.resize(esp-IR[ipx+1].opcode);
+            ipx += 2;
+        }
+        else if(IR[ipx].opcode == IRESULT)
+        {
+            data.iValue = irx;
+            stk.push(data);
+            ipx++;
+        }
+        else if(IR[ipx].opcode == INEGATIVE)
+        {
+            stk.top().iValue = -stk.top().iValue;
+            ipx++;
+        }        
+        else if(IR[ipx].opcode == DRESULT)
+        {
+            data.dValue = drx;
+            stk.push(data);
+            ipx++;
+        }
+        else if(IR[ipx].opcode == DNEGATIVE)
+        {
+            stk.top().dValue = -stk.top().dValue;
+            ipx++;
+        }
+        else if(IR[ipx].opcode == IGLOAD)
+        {
+            data.iValue = memory[IR[ipx+1].opcode].iValue;
+            stk.push(data);
+            ipx += 2;
+        }
+        else if(IR[ipx].opcode == ILLOAD)
+        {
+            data.iValue = memory[IR[ipx+1].iValue+ebp].iValue;
+            stk.push(data);
+            ipx += 2;
+        }        
+        else if(IR[ipx].opcode == DGLOAD)
+        {
+            data.dValue = memory[IR[ipx+1].opcode].dValue;
+            stk.push(data);
+            ipx += 2;
+        }
+        else if(IR[ipx].opcode == DLLOAD)
+        {
+            data.dValue = memory[IR[ipx+1].iValue+ebp].dValue;
+            stk.push(data);
+            ipx += 2;
+        }
+        else if(IR[ipx].opcode == ICONST)
+        {
+            data.iValue = IR[ipx+1].iValue;
+            stk.push(data);
+            ipx += 2;
+        }
+        else if(IR[ipx].opcode == DCONST)
+        {
+            data.dValue = IR[ipx+1].dValue;
+            stk.push(data);
+            ipx += 2;
+        }        
+        else if(IR[ipx].opcode == ITOD2)
+        {
+            MemType tmp = stk.top();
+            stk.pop();
+            stk.top().dValue = stk.top().iValue;
+            stk.push(tmp);
+            ipx += 2;
+        }
+        else if(IR[ipx].opcode == IADD)
+        {
+            int right = stk.top().iValue;
+            stk.pop();
+            int left = stk.top().iValue;
+            stk.pop();
+            data.iValue = left + right;
+            stk.push(data);
+            ipx++;
+        }
+        else if(IR[ipx].opcode == DADD)
+        {
+            double right = stk.top().dValue;
+            stk.pop();
+            double left = stk.top().dValue;
+            stk.pop();
+            data.dValue = left + right;
+            stk.push(data);    
+            ipx++;  
+        }
+        else if(IR[ipx].opcode == ISUB)
+        {
+            int right = stk.top().iValue;
+            stk.pop();
+            int left = stk.top().iValue;
+            stk.pop();
+            data.iValue = left - right;
+            stk.push(data);
+            ipx++;
+        }        
+        else if(IR[ipx].opcode == DSUB)
+        {
+            double right = stk.top().dValue;
+            stk.pop();
+            double left = stk.top().dValue;
+            stk.pop();
+            data.dValue = left - right;
+            stk.push(data); 
+            ipx++;
+        }
+        else if(IR[ipx].opcode == IMUL)
+        {
+            int right = stk.top().iValue;
+            stk.pop();
+            int left = stk.top().iValue;
+            stk.pop();
+            data.iValue = left * right;
+            stk.push(data);
+            ipx++;
+        }
+        else if(IR[ipx].opcode == DMUL)
+        {
+            double right = stk.top().dValue;
+            stk.pop();
+            double left = stk.top().dValue;
+            stk.pop();
+            data.dValue = left * right;
+            stk.push(data);  
+            ipx++;
+        }
+        else if(IR[ipx].opcode == IDIV)
+        {
+            int right = stk.top().iValue;
+            stk.pop();
+            int left = stk.top().iValue;
+            stk.pop();
+            data.iValue = left / right;
+            stk.push(data);
+            ipx++;
+        }        
+        else if(IR[ipx].opcode == DDIV)
+        {
+            double right = stk.top().dValue;
+            stk.pop();
+            double left = stk.top().dValue;
+            stk.pop();
+            data.dValue = left / right;
+            stk.push(data);  
+            ipx++;
+        }
+        else if(IR[ipx].opcode == ISML)
+        {
+            int right = stk.top().iValue;
+            stk.pop();
+            int left = stk.top().iValue;
+            stk.pop();
+            data.iValue = left < right;
+            stk.push(data);
+            ipx++;
+        }
+        else if(IR[ipx].opcode == DSML)
+        {
+            double right = stk.top().dValue;
+            stk.pop();
+            double left = stk.top().dValue;
+            stk.pop();
+            data.dValue = left < right;
+            stk.push(data);  
+            ipx++;
+        }
+        else if(IR[ipx].opcode == IBIG)
+        {
+            int right = stk.top().iValue;
+            stk.pop();
+            int left = stk.top().iValue;
+            stk.pop();
+            data.iValue = left > right;
+            stk.push(data);
+            ipx++;
+        }        
+        else if(IR[ipx].opcode == DBIG)
+        {
+            double right = stk.top().dValue;
+            stk.pop();
+            double left = stk.top().dValue;
+            stk.pop();
+            data.dValue = left > right;
+            stk.push(data);  
+            ipx++;
+        }
+        else if(IR[ipx].opcode == ISMLEQL)
+        {
+            int right = stk.top().iValue;
+            stk.pop();
+            int left = stk.top().iValue;
+            stk.pop();
+            data.iValue = left <= right;
+            stk.push(data);  
+            ipx++;     
+        }
+        else if(IR[ipx].opcode == DSMLEQL)
+        {
+            double right = stk.top().dValue;
+            stk.pop();
+            double left = stk.top().dValue;
+            stk.pop();
+            data.dValue = left <= right;
+            stk.push(data);  
+            ipx++;
+        }        
+        else if(IR[ipx].opcode == IEQLEQL)
+        {
+            int right = stk.top().iValue;
+            stk.pop();
+            int left = stk.top().iValue;
+            stk.pop();
+            data.iValue = left == right;
+            stk.push(data);
+            ipx++;
+        }
+        else if(IR[ipx].opcode == DEQLEQL)
+        {
+            double right = stk.top().dValue;
+            stk.pop();
+            double left = stk.top().dValue;
+            stk.pop();
+            data.dValue = left == right;
+            stk.push(data);  
+            ipx++;
+        }
+        else if(IR[ipx].opcode == IBIGEQL)
+        {
+            int right = stk.top().iValue;
+            stk.pop();
+            int left = stk.top().iValue;
+            stk.pop();
+            data.iValue = left >= right;
+            stk.push(data);
+            ipx++;
+        }
+        else if(IR[ipx].opcode == DBIGEQL)
+        {
+            double right = stk.top().dValue;
+            stk.pop();
+            double left = stk.top().dValue;
+            stk.pop();
+            data.dValue = left >= right;
+            stk.push(data);  
+            ipx++;
+        }        
+        else if(IR[ipx].opcode == INOTEQL)
+        {
+            int right = stk.top().iValue;
+            stk.pop();
+            int left = stk.top().iValue;
+            stk.pop();
+            data.iValue = left != right;
+            stk.push(data);
+            ipx++;
+        }
+        else if(IR[ipx].opcode == DNOTEQL)
+        {
+            double right = stk.top().dValue;
+            stk.pop();
+            double left = stk.top().dValue;
+            stk.pop();
+            data.dValue = left != right;
+            stk.push(data);  
+            ipx++;
         }
     }
 

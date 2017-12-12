@@ -5,14 +5,18 @@ AST& Parser::parse(const char* c)
 {
     code = c;
     if(code == NULL)
+    {
+        success = false;
         return tree;
+    }
     crtToken = getNextToken();
     try{
         program();
     }
     catch(size_t i)
     {
-        std::cout << "GG:" << i << std::endl;
+        std::cout << "Error at Line:" << line << "Position:" << pos << std::endl;
+        success = false;
     }
     return tree;
 }

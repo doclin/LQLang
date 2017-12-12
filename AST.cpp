@@ -1,4 +1,5 @@
 #include "AST.h"
+#include <cstring>
 
 
 bool AST::addRoot()
@@ -8,11 +9,23 @@ bool AST::addRoot()
     return true;
 }
 
+
+bool AST::checkMain()
+{
+    size_t tmpID;
+    int tmpTF;
+    if(!table.findName("main", 4, tmpID, tmpTF))
+        return false;    
+}
+
 bool AST::addFuncDef(const char* name, size_t nameLength, int typeFlag)
 {
-    if(!table.addName(name, nameLength, IDCount, typeFlag+5))
+    size_t funcName = IDCount;
+    if(nameLength==4 && memcmp(name, "main", 4)==0)
+        funcName = 0xabcdef12;
+    if(!table.addName(name, nameLength, funcName, typeFlag+5))
         return false;
-    *crtNode = new FuncNode(IDCount, typeFlag);
+    *crtNode = new FuncNode(funcName, typeFlag);
     stk.push(*crtNode);
     crtNode = &static_cast<FuncNode*>(*crtNode) -> params;
     table.addScope();

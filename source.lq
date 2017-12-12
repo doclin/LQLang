@@ -1,43 +1,19 @@
 
 int[3] array;
 int global;
-int i;
+int static;
 
 int func(int i)
 {
-    if(global)
-    {
-        int i;
-        double j;
-        i = array[1]+1;
-    }
     return i+1;
 }
 
-int[2] a, b;
-double c, d;
-
-void main()
+int main()
 {
-    if(c == 4)
-    {
-        c = a[1]+1;
-        d = ((-a[2] +- 13)*10/4) <= 5 >10 +2;
-    }
-    else
-    {
-        a[0] = a[1] - 1;
-    }
-    int index;
-    index = 0;
-    while(1)
-    {
-        index = index + 1;
-        if(index >= 100)
-        {
-            break; 
-        }
-    }
+    global = 1;
+    int a;
+    a = (3+5)/3+global;
+    return a;
 }
 
 
