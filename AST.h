@@ -162,9 +162,11 @@ private:
     ASTNode** crtNode;
     std::stack<ASTNode*> stk;
     size_t IDCount;
-    bool breakFlag;
+    int breakFlag;
+    bool isHigher(OperatorNode* a, OperatorNode* b);
+    int getLevel(OperatorNode* node);
 public:
-    AST() : root(NULL), crtNode(NULL), IDCount(0), breakFlag(false) {}
+    AST() : root(NULL), crtNode(NULL), IDCount(0), breakFlag(0) {}
     ASTNode* getRoot() { return root; }
     bool addRoot();
     bool addFuncDef(const char* name, size_t nameLength, int typeFlag);

@@ -45,28 +45,11 @@ by whu Doclin
 ```
 
 
-
-栈顶esp，栈基ebp
-函数调用先压
-
-return
-移动esp
-返回值
-
-
-
-
 类型检查：
 函数调用参数
 expr类型
 void加return
 内置函数
-
-
-IR转换先一趟写完
-expr值放栈顶
-函数返回放栈顶
-varval放栈顶
 
 
 

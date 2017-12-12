@@ -1,7 +1,7 @@
 #include "parser.h"
 #include <iostream>
 
-const AST& Parser::parse(const char* c)
+AST& Parser::parse(const char* c)
 {
     code = c;
     if(code == NULL)
@@ -186,7 +186,7 @@ void Parser::lclStatements()
                     crtToken = getNextToken();
                     if(!tree.addExpr())
                         throw line;
-                    expr();
+                    expr(false);
                     if(!tree.endExpr())
                         throw line;
                     if(crtToken == ';')
@@ -211,7 +211,7 @@ void Parser::lclStatements()
             crtToken = getNextToken();
             if(!tree.addExpr())
                 throw line;
-            expr();
+            expr(false);
             if(!tree.endExpr())
                 throw line;
             if(crtToken == ';')
@@ -281,7 +281,7 @@ void Parser::ifStmt()
             crtToken = getNextToken();
             if(!tree.addExpr())
                 throw line;
-            expr();
+            expr(false);
             if(!tree.endExpr())
                 throw line;
             if(!tree.endIfVal())
@@ -349,7 +349,7 @@ void Parser::whileStmt()
             crtToken = getNextToken();
             if(!tree.addExpr())
                 throw line;
-            expr();
+            expr(false);
             if(!tree.endExpr())
                 throw line;
             if(!tree.endWhileVal())
@@ -403,7 +403,7 @@ void Parser::returnStmt()
         crtToken = getNextToken();
         if(!tree.addExpr())
             throw line;
-        expr();
+        expr(false);
         if(!tree.endExpr())
             throw line;
         if(crtToken == ';')
@@ -460,7 +460,7 @@ void Parser::arguments()
     {
         if(!tree.addExpr())
             throw line;
-        expr();
+        expr(false);
         if(!tree.endExpr())
             throw line;
         if(crtToken == ',')
@@ -504,17 +504,17 @@ void Parser::variables(int typeFlag, size_t arrLength)
         throw line;
 }
 
-void Parser::expr()
+void Parser::expr(bool nf)
 {
     if(crtToken==IDK || crtToken=='(' || crtToken=='-' || crtToken==INTVALUE || crtToken==DOUBLEVALUE)
     {
-        operand();
+        operand(nf);
         if(isOperator(crtToken))
         {
             if(!tree.addOperator(crtToken))
                 throw line;
             crtToken = getNextToken();
-            expr();
+            expr(nf);
         }
         else if(crtToken==')' || crtToken==';' || crtToken==',')
             return;
@@ -525,12 +525,11 @@ void Parser::expr()
         throw line;
 }
 
-void Parser::operand()
+void Parser::operand(bool nf)
 {
-    int negativeFlag = false;
     if(crtToken == '-')
     {
-        negativeFlag = true;
+        nf = !nf;
         crtToken = getNextToken();
     }
     if(crtToken == IDK)
@@ -538,7 +537,7 @@ void Parser::operand()
         crtToken = getNextToken();
         if(crtToken == '(')
         {
-            if(!tree.addFuncCall(IDValue, IDLength, negativeFlag))
+            if(!tree.addFuncCall(IDValue, IDLength, nf))
                 throw line;
             crtToken = getNextToken();
             arguments();
@@ -553,7 +552,7 @@ void Parser::operand()
         {
             if(getNextToken()==INTVALUE && getNextToken()==']')
             {
-                if(!tree.addVarVal(IDValue, IDLength, integerValue, negativeFlag))
+                if(!tree.addVarVal(IDValue, IDLength, integerValue, nf))
                     throw line;
                 crtToken = getNextToken();
             }
@@ -562,7 +561,7 @@ void Parser::operand()
         }
         else if(isOperator(crtToken) || crtToken==')' || crtToken==';' || crtToken==',')
         {
-            if(!tree.addVarVal(IDValue, IDLength, -1, negativeFlag))
+            if(!tree.addVarVal(IDValue, IDLength, -1, nf))
                 throw line;
             return;
         }
@@ -574,7 +573,7 @@ void Parser::operand()
         if(!tree.addOperator('('))
             throw line;
         crtToken = getNextToken();
-        expr();
+        expr(nf);
         if(crtToken == ')')
         {
             if(!tree.addOperator(')'))
@@ -586,13 +585,13 @@ void Parser::operand()
     }
     else if(crtToken==INTVALUE)
     {
-        if(!tree.addInt(integerValue, negativeFlag))
+        if(!tree.addInt(integerValue, nf))
             throw line;
         crtToken = getNextToken();
     }
     else if(crtToken==DOUBLEVALUE)
     {
-        if(!tree.addDouble(doubleValue, negativeFlag))
+        if(!tree.addDouble(doubleValue, nf))
             throw line;
         crtToken = getNextToken();
     }    

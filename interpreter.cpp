@@ -2,10 +2,11 @@
 
 
 
-int Interpreter::exec(AST& tree)
+void Interpreter::interpret(AST& tree)
 {
     root = tree.getRoot();
     translateIR();
+    exec();
 }
 
 void Interpreter::translateIR()
@@ -180,7 +181,69 @@ void Interpreter::translateLclStmts(ASTNode* n, int& local)
         }
         else if(n->nodeType == IFNODE)
         {
-            ;
+            size_t tmpAddress;
+            size_t tmpAddress1;
+            translateExpr(static_cast<IfNode*>(n)->value);
+            instruction.opcode = IFCMP;
+            IR.push_back(instruction);
+            tmpAddress = IR.size();
+            IR.push_back(instruction);
+            translateLclStmts(static_cast<IfNode*>(n)->falseStmts, local);
+            instruction.opcode = JUMP;
+            IR.push_back(instruction);
+            tmpAddress1 = IR.size();
+            IR.push_back(instruction);
+            IR[tmpAddress].opcode = IR.size();
+            translateLclStmts(static_cast<IfNode*>(n)->trueStmts, local);
+            IR[tmpAddress1].opcode = IR.size();
+        }
+        else if(n->nodeType == WHILENODE)
+        {
+            size_t tmpAddress;
+            size_t tmpAddress1;
+            tmpAddress = IR.size();
+            translateExpr(static_cast<WhileNode*>(n)->value);
+            instruction.opcode = IFNCMP;
+            IR.push_back(instruction);
+            tmpAddress1 = IR.size();
+            IR.push_back(instruction);
+            translateLclStmts(static_cast<WhileNode*>(n)->lclStmts, local);
+            instruction.opcode = JUMP;
+            IR.push_back(instruction);
+            instruction.opcode = tmpAddress;
+            IR.push_back(instruction);
+            IR[tmpAddress1].opcode = IR.size();
+            while(!breakpoints.empty())
+            {
+                IR[breakpoints.back].opcode = IR.size();
+                breakpoints.pop_back();
+            }
+        }
+        else if(n->nodeType == BREAKNODE)
+        {
+            instruction.opcode = JUMP;
+            IR.push_back(instruction);
+            breakpoints.push_back(IR.size());
+            IR.push_back(instruction);
+        }
+        else if(n->nodeType == RETURNNODE)
+        {
+            if(static_cast<ReturnNode*>(n)->value == NULL)
+            {
+                instruction.opcode = JUMPBACK;
+                IR.push_back(instruction);
+            }
+            else
+            {
+                translateExpr(static_cast<ReturnNode*>(n)->value);
+                int varType = static_cast<ExprNode*>(static_cast<ReturnNode*>(n)->value)->varType;
+                if(varType == TINT)
+                    instruction.opcode = IRETURN;
+                else
+                    instruction.opcode = DRETURN;
+                instruction.opcode = JUMPBACK;
+                IR.push_back(instruction);
+            }
         }
     }
 }
@@ -190,8 +253,8 @@ void Interpreter::translateCall(ASTNode* n)
     int space = 0;
     for(ASTNode* node=static_cast<CallNode*>(n)->args; node!=NULL; node=node->next)
     {
-        int typeFlag = static_cast<ExprNode*>(node)->varType;
         translateExpr(node);
+        int typeFlag = static_cast<ExprNode*>(node)->varType;
         instruction.opcode = MALLOC;
         IR.push_back(instruction);
         if(typeFlag == TINT)
@@ -248,6 +311,7 @@ void Interpreter::translateExpr(ASTNode* n)
                     IR.push_back(instruction);
                 }
             }
+            typeStack.push(typeFlag);
         }
         else if(node->nodeType == VARVALNODE)
         {
@@ -341,6 +405,7 @@ void Interpreter::translateExpr(ASTNode* n)
                     IR.push_back(instruction);
                 }
             }
+            typeStack.push(typeFlag);
         }
         else if(node->nodeType == INTNODE)
         {
@@ -355,6 +420,7 @@ void Interpreter::translateExpr(ASTNode* n)
                 instruction.opcode = INEGATIVE;
                 IR.push_back(instruction);
             }
+            typeStack.push(TINT);
         }
         else if(node->nodeType == DOUBLENODE)
         {
@@ -368,13 +434,148 @@ void Interpreter::translateExpr(ASTNode* n)
             {
                 instruction.opcode = DNEGATIVE;
                 IR.push_back(instruction);
-            }            
+            }
+            typeStack.push(TDOUBLE);
         }
         else if(node->nodeType == OPERATORNODE)
         {
             int op = static_cast<OperatorNode*>(node)->op;
+            int rightType = typeStack.top();
+            typeStack.pop();
+            int leftType = typeStack.top();
+            typeStack.pop();
+            int resultType;
+            if(leftType==TINT && rightType==TDOUBLE)
+            {
+                instruction.opcode = ITOD2;
+                IR.push_back(instruction);
+                resultType = TDOUBLE;
+            }
+            else if(leftType==TDOUBLE && rightType==TINT)
+            {
+                instruction.opcode = ITOD;
+                IR.push_back(instruction);
+                resultType = TDOUBLE;
+            }
+            else if(leftType == TINT)
+                resultType = TINT;
+            else
+                resultType = TDOUBLE;
 
+                
+            if(op=='+' && resultType==TINT)
+            {
+                instruction.opcode = IADD;
+                IR.push_back(instruction);
+            }
+            else if(op=='+' && resultType==TDOUBLE)
+            {
+                instruction.opcode = DADD;
+                IR.push_back(instruction);
+            }
+            else if(op=='-' && resultType==TINT)
+            {
+                instruction.opcode = ISUB;
+                IR.push_back(instruction);
+            }
+            else if(op=='-' && resultType==TDOUBLE)
+            {
+                instruction.opcode = DSUB;
+                IR.push_back(instruction);
+            }            
+            else if(op=='*' && resultType==TINT)
+            {
+                instruction.opcode = IMUL;
+                IR.push_back(instruction);
+            }
+            else if(op=='*' && resultType==TDOUBLE)
+            {
+                instruction.opcode = DMUL;
+                IR.push_back(instruction);
+            }
+            else if(op=='/' && resultType==TINT)
+            {
+                instruction.opcode = IDIV;
+                IR.push_back(instruction);
+            }
+            else if(op=='/' && resultType==TDOUBLE)
+            {
+                instruction.opcode = DDIV;
+                IR.push_back(instruction);
+            }
+            else if(op=='<' && resultType==TINT)
+            {
+                instruction.opcode = ISML;
+                IR.push_back(instruction);
+            }
+            else if(op=='<' && resultType==TDOUBLE)
+            {
+                instruction.opcode = DSML;
+                IR.push_back(instruction);
+            }            
+            else if(op=='>' && resultType==TINT)
+            {
+                instruction.opcode = IBIG;
+                IR.push_back(instruction);
+            }
+            else if(op=='>' && resultType==TDOUBLE)
+            {
+                instruction.opcode = DBIG;
+                IR.push_back(instruction);
+            }
+            else if(op=='<'+1000 && resultType==TINT)
+            {
+                instruction.opcode = ISMLEQL;
+                IR.push_back(instruction);
+            }
+            else if(op=='<'+1000 && resultType==TDOUBLE)
+            {
+                instruction.opcode = DSMLEQL;
+                IR.push_back(instruction);
+            }
+            else if(op=='='+1000 && resultType==TINT)
+            {
+                instruction.opcode = IEQLEQL;
+                IR.push_back(instruction);
+            }
+            else if(op=='='+1000 && resultType==TDOUBLE)
+            {
+                instruction.opcode = DEQLEQL;
+                IR.push_back(instruction);
+            }            
+            else if(op=='>'+1000 && resultType==TINT)
+            {
+                instruction.opcode = IBIGEQL;
+                IR.push_back(instruction);
+            }
+            else if(op=='>'+1000 && resultType==TDOUBLE)
+            {
+                instruction.opcode = DBIGEQL;
+                IR.push_back(instruction);
+            }
+            else if(op=='!'+1000 && resultType==TINT)
+            {
+                instruction.opcode = INOTEQL;
+                IR.push_back(instruction);
+            }
+            else if(op=='!'+1000 && resultType==TDOUBLE)
+            {
+                instruction.opcode = DNOTEQL;
+                IR.push_back(instruction);
+            }
+
+            if(op=='<' || op=='>' || op=='<'+1000 || op=='='+1000 || op=='>'+1000 || op=='!'+1000) 
+                resultType = TINT;
+            typeStack.push(resultType);
         }
     }
+    static_cast<ExprNode*>(n)->varType = typeStack.top();
+    typeStack.pop();
 }
 
+
+void Interpreter::exec()
+{
+    ;
+
+}

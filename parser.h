@@ -44,13 +44,13 @@ private:
     void parameters();
     void arguments();
     void variables(int typeFlag, size_t arrLength=0);
-    void expr();
-    void operand();
+    void expr(bool nf);
+    void operand(bool nf);
     inline bool isOperator(int t) { return (t=='<' || t=='>' || t==1000+'=' || t==1000+'<' || t==1000+'!' || t==1000+'>' || t=='+' || t=='-' || t=='*' || t=='/'); }
 public:
     Parser() : line(1), pos(1) {}
     ~Parser() {}
-    const AST& parse(const char* c);
+    AST& parse(const char* c);
 };
 
 

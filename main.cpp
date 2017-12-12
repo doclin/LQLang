@@ -2,6 +2,7 @@
 #include <iostream>     // std::cout
 #include <fstream>      // std::ifstream
 #include "parser.h"
+#include "interpreter.h"
 
 using namespace std;
 
@@ -28,7 +29,10 @@ int main () {
     buffer[length] = '\0';
 
     Parser p;
-    p.parse(buffer);
+    AST& tree = p.parse(buffer);
+    Interpreter intprt;
+    intprt.interpret(tree);
+
 
 
 

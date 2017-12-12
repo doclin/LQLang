@@ -9,7 +9,10 @@ class Interpreter
 private:
     enum { VARNODE=1, FUNCNODE, CALLNODE, ASSIGNNODE, IFNODE, WHILENODE, BREAKNODE, RETURNNODE, EXPRNODE, INTNODE, DOUBLENODE, VARVALNODE, OPERATORNODE };
     enum { TVOID=0, TINT, TDOUBLE, TINTARR, TDOUBLEARR, TFUNCVOID, TFUNCINT, TFUNCDOUBLE };
-    //enum { IALLOC, DALLOC, IAALLOC, DAALLOC };
+    enum { PUSHEBP, NEWEBP, MALLOC, MALLOCARR, DTOI, ITOD, IGSTORE, ILSTORE, DGSTORE, DLSTORE, IFCMP, IFNCMP, JUMP, JUMPBACK,
+            IRETURN, DRETURN, ISTORETOP, DSTORETOP, PUSHADRS, OLDEBP, OLDESP, IRESULT, INEGATIVE, DRESULT, DNEGATIVE,
+            IGLOAD, ILLOAD, DGLOAD, DLLOAD, ICONST, DCONST, ITOD2, IADD, DADD, ISUB, DSUB, IMUL, DMUL, IDIV, DDIV, 
+            ISML, DSML, IBIG, DBIG, ISMLEQL, DSMLEQL, IEQLEQL, DEQLEQL, IBIGEQL, DBIGEQL, INOTEQL, DNOTEQL};
     ASTNode* root;
     union IRType
     {
@@ -19,6 +22,8 @@ private:
     } instruction;
     std::map<size_t, std::pair<int, bool> > addressTable;
     std::vector<IRType> IR;
+    std::vector<size_t> breakpoints;
+    std::stack<int> typeStack;
 
     union MemType
     {
@@ -27,18 +32,14 @@ private:
     } data;
     std::vector<MemType> memory;
 
-
-
-
     void translateIR();
     void translateLclStmts(ASTNode* n, int& local);
     void translateCall(ASTNode* n);
     void translateExpr(ASTNode* n);
-
-
 public:
     Interpreter() {}
-    int exec(AST& tree);
+    void interpret(AST& tree);
+    void exec();
     ~Interpreter() {}
 };
 

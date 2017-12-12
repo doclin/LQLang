@@ -28,6 +28,7 @@ bool AST::endFuncDef()
     for(ASTNode* n=static_cast<FuncNode*>(stk.top())->params; n!=NULL; n=n->next)
         i++;
     static_cast<FuncNode*>(stk.top())->paramNum = i;
+    *crtNode = new ReturnNode();
     crtNode = &(stk.top()->next);
     stk.pop();
     table.popScope();
@@ -107,10 +108,10 @@ bool AST::endExpr()
 {
     if(stk.top()->nodeType != EXPRNODE)
         return false;
+
     ASTNode* operandList = &ASTNode();
     ASTNode* crtOperand = operandList;
-    ASTNode* operatorList = &ASTNode();
-    ASTNode* crtOperator = operatorList;
+    std::stack<OperatorNode*> operatorStack;
     for(ASTNode* origin = static_cast<ExprNode*>(stk.top())->value; origin != NULL; origin = origin->next)
     {
         if(origin->nodeType==CALLNODE && static_cast<CallNode*>(origin)->retType==TVOID)
@@ -121,14 +122,67 @@ bool AST::endExpr()
             crtOperand = crtOperand -> next;
         }
         else
-
+        {
+            if(operatorStack.empty() || static_cast<OperatorNode*>(origin)->op=='(' || isHigher(static_cast<OperatorNode*>(origin), operatorStack.top()))
+            {
+                operatorStack.push(static_cast<OperatorNode*>(origin));
+            }
+            else
+            {
+                if(static_cast<OperatorNode*>(origin)->op==')')
+                {
+                    while(operatorStack.top()->op != '(')
+                    {
+                        crtOperand -> next = operatorStack.top();
+                        crtOperand = crtOperand -> next;
+                        operatorStack.pop();
+                    }
+                    operatorStack.pop();
+                }
+                else
+                {
+                    while((!operatorStack.empty()) && getLevel(static_cast<OperatorNode*>(origin))<=getLevel(operatorStack.top()) && operatorStack.top()->op!='(')
+                    {
+                        crtOperand -> next = operatorStack.top();
+                        crtOperand = crtOperand -> next;
+                        operatorStack.pop();
+                    }
+                    operatorStack.push(static_cast<OperatorNode*>(origin));
+                }
+            }
+        }
     }
-
-
+    while(!operatorStack.empty())
+    {
+        crtOperand -> next = operatorStack.top();
+        crtOperand = crtOperand -> next;
+        operatorStack.pop();       
+    }
+    static_cast<ExprNode*>(stk.top())->value = operandList -> next;
 
     crtNode = &stk.top()->next;
     stk.pop();
     return true;
+}
+
+bool AST::isHigher(OperatorNode* a, OperatorNode* b)
+{
+    return (getLevel(a) > getLevel(b));
+}
+
+int AST::getLevel(OperatorNode* node)
+{
+    int op = node -> op;
+    if(op=='<' || op=='>' || op==1000+'<' || op==1000+'>' || op==1000+'=' || op==1000+'!')
+        return 1;
+    else if(op=='+' || op=='-')
+        return 2;
+    else if(op=='*' || op=='/')
+        return 3;
+    else if(op=='(')
+        return 4;
+    else if(op==')')
+        return 0;
 }
 
 bool AST::endAssign()
@@ -191,7 +245,7 @@ bool AST::endWhileVal()
         return false;
     crtNode = &static_cast<WhileNode*>(stk.top())->lclStmts;
     table.addScope();
-    breakFlag = true;
+    breakFlag++;
     return true;
 }
 
@@ -202,13 +256,13 @@ bool AST::endWhile()
     crtNode = &stk.top() -> next;
     stk.pop();
     table.popScope();
-    breakFlag = false;
+    breakFlag--;
     return true;
 }
 
 bool AST::addBreak()
 {
-    if(!breakFlag)
+    if(breakFlag <= 0)
         return false;
     *crtNode = new BreakNode();
     crtNode = &(*crtNode) -> next;
