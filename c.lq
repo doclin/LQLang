@@ -1,0 +1,37 @@
+int[3] array;
+int global;
+int static;
+
+
+
+int main()
+{
+    global = 1;
+    static = 2;
+    int a;
+    if(global == 1)
+    {
+        if(static == 2)
+        {
+            a = 1;
+        }
+        else
+        {
+            a = 2;
+        }
+    }
+    else
+    {
+        if(static == 2)
+        {
+            a = 3;
+        }
+        else
+        {
+            a = 4;
+        }
+    }
+    return a;
+}
+
+

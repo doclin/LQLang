@@ -1,0 +1,23 @@
+int[3] array;
+int global;
+int static;
+
+int func(int i)
+{
+    static = 0;
+    while(static < 10)
+    {
+        static = static + 1;
+    }
+    return static + i;
+}
+
+int main()
+{
+    global = 5;
+    int a;
+    a = func(global);
+    return a;
+}
+
+

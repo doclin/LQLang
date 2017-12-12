@@ -15,7 +15,7 @@ AST& Parser::parse(const char* c)
     }
     catch(size_t i)
     {
-        std::cout << "Error at Line:" << line << "Position:" << pos << std::endl;
+        std::cout << "Error at Line:" << line << " Position: " << pos << std::endl;
         success = false;
     }
     return tree;

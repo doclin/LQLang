@@ -12,7 +12,7 @@ int main()
 {
     global = 1;
     int a;
-    a = (3+5)/3+global;
+    a = (3+5)/3 + global;
     return a;
 }
 

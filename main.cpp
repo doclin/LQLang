@@ -6,7 +6,7 @@
 using namespace std;
 
 int main () {
-  std::ifstream is ("source.lq", std::ifstream::binary);
+  std::ifstream is ("test9.lq", std::ifstream::binary);
   if (is) {
     is.seekg (0, is.end);
     int length = is.tellg();
