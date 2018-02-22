@@ -5,18 +5,21 @@ int static;
 int func(int i)
 {
     static = 0;
-    while(static < 10)
-    {
-        static = static + 1;
+    if(i==0){
+        while(static < 10)
+        {
+            static = static + 1;
+        }
+    }else{
+        return static + i;
     }
-    return static + i;
 }
 
 int main()
 {
     global = 5;
     int a;
-    a = func(global);
+    a = func(0);
     return a;
 }
 

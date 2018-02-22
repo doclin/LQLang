@@ -1032,7 +1032,7 @@ void Interpreter::exec()
         {
             MemType tmp = stk.top();
             stk.pop();
-            stk.top().dValue = stk.top().iValue;
+            stk.top().dValue = (double)stk.top().iValue;
             stk.push(tmp);
             ipx += 2;
         }
