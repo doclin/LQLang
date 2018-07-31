@@ -608,7 +608,6 @@ void Interpreter::translateExpr(ASTNode* n)
     typeStack.pop();
 }
 
-
 void Interpreter::showIR()
 {
     using namespace std;
@@ -616,229 +615,284 @@ void Interpreter::showIR()
     ebp = memory.size();
     while(ipx < IR.size())
     {
-        if(IR[ipx].opcode == PUSHEBP)
+        switch(IR[ipx].opcode)
+        {
+        case PUSHEBP:
         {
             cout << ipx++ << " PUSHEBP" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == NEWEBP)
+        case NEWEBP:
         {
             cout << ipx++ << " NEWEBP" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == MALLOC)
+        case MALLOC:
         {
             cout << ipx++ << " MALLOC" << endl;
+            break;
         }        
-        else if(IR[ipx].opcode == MALLOCARR)
+        case MALLOCARR:
         {
             cout << ipx++ << " MALLOCARR" << endl;
             cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
+            break;
         }
-        else if(IR[ipx].opcode == DTOI)
+        case DTOI:
         {
             cout << ipx++ << " DTOI" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == ITOD)
+        case ITOD:
         {
             cout << ipx++ << " ITOD" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == IGSTORE)
+        case IGSTORE:
         {
             cout << ipx++ << " IGSTORE" << endl;
             cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
+            break;
         }        
-        else if(IR[ipx].opcode == ILSTORE)
+        case ILSTORE:
         {
             cout << ipx++ << " ILSTORE" << endl;
             cout << ipx++ << " "; cout << IR[ipx-1].iValue << endl;
+            break;
         }
-        else if(IR[ipx].opcode == DGSTORE)
+        case DGSTORE:
         {
             cout << ipx++ << " DGSTORE" << endl;
             cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
+            break;
         }
-        else if(IR[ipx].opcode == DLSTORE)
+        case DLSTORE:
         {
             cout << ipx++ << " DLSTORE" << endl;
             cout << ipx++ << " "; cout << IR[ipx-1].iValue << endl;            
+            break;
         }
-        else if(IR[ipx].opcode == IFCMP)
+        case IFCMP:
         {
             cout << ipx++ << " IFCMP" << endl;
             cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
+            break;
         }        
-        else if(IR[ipx].opcode == IFNCMP)
+        case IFNCMP:
         {
             cout << ipx++ << " IFNCMP" << endl;
             cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
+            break;
         }
-        else if(IR[ipx].opcode == JUMP)
+        case JUMP:
         {
             cout << ipx++ << " JUMP" << endl;
             cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
+            break;
         }
-        else if(IR[ipx].opcode == JUMPBACK)
+        case JUMPBACK:
         {
             cout << ipx++ << " JUMPBACK" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == IRETURN)
+        case IRETURN:
         {
             cout << ipx++ << " IRETURN" << endl;
+            break;
         }        
-        else if(IR[ipx].opcode == DRETURN)
+        case DRETURN:
         {
             cout << ipx++ << " DRETURN" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == ISTORETOP)
+        case ISTORETOP:
         {
             cout << ipx++ << " ISTORETOP" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == DSTORETOP)
+        case DSTORETOP:
         {
             cout << ipx++ << " DSTORETOP" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == PUSHADRS)
+        case PUSHADRS:
         {
             cout << ipx++ << " PUSHADRS" << endl;
             cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
+            break;
         }        
-        else if(IR[ipx].opcode == OLDEBP)
+        case OLDEBP:
         {
             cout << ipx++ << " OLDEBP" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == OLDESP)
+        case OLDESP:
         {
             cout << ipx++ << " OLDESP" << endl;
             cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
+            break;
         }
-        else if(IR[ipx].opcode == IRESULT)
+        case IRESULT:
         {
             cout << ipx++ << " IRESULT" << endl;        
+            break;
         }
-        else if(IR[ipx].opcode == INEGATIVE)
+        case INEGATIVE:
         {
             cout << ipx++ << " INEGATIVE" << endl;
+            break;
         }        
-        else if(IR[ipx].opcode == DRESULT)
+        case DRESULT:
         {
             cout << ipx++ << " DRESULT" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == DNEGATIVE)
+        case DNEGATIVE:
         {
             cout << ipx++ << " DNEGATIVE" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == IGLOAD)
+        case IGLOAD:
         {
             cout << ipx++ << " IGLOAD" << endl;
             cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
+            break;
         }
-        else if(IR[ipx].opcode == ILLOAD)
+        case ILLOAD:
         {
             cout << ipx++ << " ILLOAD" << endl;
             cout << ipx++ << " "; cout << IR[ipx-1].iValue << endl;
+            break;
         }        
-        else if(IR[ipx].opcode == DGLOAD)
+        case DGLOAD:
         {
             cout << ipx++ << " DGLOAD" << endl;
             cout << ipx++ << " "; cout << IR[ipx-1].opcode << endl;
+            break;
         }
-        else if(IR[ipx].opcode == DLLOAD)
+        case DLLOAD:
         {
             cout << ipx++ << " DLLOAD" << endl;
             cout << ipx++ << " "; cout << IR[ipx-1].iValue << endl;
+            break;
         }
-        else if(IR[ipx].opcode == ICONST)
+        case ICONST:
         {
             cout << ipx++ << " ICONST" << endl;
             cout << ipx++ << " "; cout << IR[ipx-1].iValue << endl;
+            break;
         }
-        else if(IR[ipx].opcode == DCONST)
+        case DCONST:
         {
             cout << ipx++ << " DCONST" << endl;
             cout << ipx++ << " "; cout << IR[ipx-1].dValue << endl;
+            break;
         }        
-        else if(IR[ipx].opcode == ITOD2)
+        case ITOD2:
         {
             cout << ipx++ << " ITOD2" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == IADD)
+        case IADD:
         {
             cout << ipx++ << " IADD" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == DADD)
+        case DADD:
         {
             cout << ipx++ << " DADD" << endl;        
+            break;
         }
-        else if(IR[ipx].opcode == ISUB)
+        case ISUB:
         {
             cout << ipx++ << " ISUB" << endl;
+            break;
         }        
-        else if(IR[ipx].opcode == DSUB)
+        case DSUB:
         {
             cout << ipx++ << " DSUB" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == IMUL)
+        case IMUL:
         {
             cout << ipx++ << " IMUL" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == DMUL)
+        case DMUL:
         {
             cout << ipx++ << " DMUL" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == IDIV)
+        case IDIV:
         {
             cout << ipx++ << " IDIV" << endl;
+            break;
         }        
-        else if(IR[ipx].opcode == DDIV)
+        case DDIV:
         {
             cout << ipx++ << " DDIV" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == ISML)
+        case ISML:
         {
             cout << ipx++ << " ISML" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == DSML)
+        case DSML:
         {
             cout << ipx++ << " DSML" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == IBIG)
+        case IBIG:
         {
             cout << ipx++ << " IBIG" << endl;
+            break;
         }        
-        else if(IR[ipx].opcode == DBIG)
+        case DBIG:
         {
             cout << ipx++ << " DBIG" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == ISMLEQL)
+        case ISMLEQL:
         {
             cout << ipx++ << " ISMLEQL" << endl;        
+            break;
         }
-        else if(IR[ipx].opcode == DSMLEQL)
+        case DSMLEQL:
         {
             cout << ipx++ << " DSMLEQL" << endl;
+            break;
         }        
-        else if(IR[ipx].opcode == IEQLEQL)
+        case IEQLEQL:
         {
             cout << ipx++ << " IEQLEQL" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == DEQLEQL)
+        case DEQLEQL:
         {
             cout << ipx++ << " DEQLEQL" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == IBIGEQL)
+        case IBIGEQL:
         {
             cout << ipx++ << " IBIGEQL" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == DBIGEQL)
+        case DBIGEQL:
         {
             cout << ipx++ << " DBIGEQL" << endl;
+            break;
         }        
-        else if(IR[ipx].opcode == INOTEQL)
+        case INOTEQL:
         {
             cout << ipx++ << " INOTEQL" << endl;
+            break;
         }
-        else if(IR[ipx].opcode == DNOTEQL)
+        case DNOTEQL:
         {
             cout << ipx++ << " DNOTEQL" << endl;
+            break;
+        }
         }
     }
 
@@ -850,193 +904,227 @@ void Interpreter::exec()
     ipx = IR.size() - 4;
     while(ipx < IR.size())
     {
-        if(IR[ipx].opcode == PUSHEBP)
+        switch(IR[ipx].opcode)
+        {
+        case PUSHEBP:
         {
             data.address = ebp;
             memory.push_back(data);
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == NEWEBP)
+        case NEWEBP:
         {
             ebp = memory.size() - 1;
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == MALLOC)
+        case MALLOC:
         {
             memory.push_back(data);
             ipx++;
+            break;
         }        
-        else if(IR[ipx].opcode == MALLOCARR)
+        case MALLOCARR:
         {
             memory.resize(memory.size() + IR[ipx+1].opcode);
             ipx += 2;
+            break;
         }
-        else if(IR[ipx].opcode == DTOI)
+        case DTOI:
         {
             stk.top().iValue = (int)stk.top().dValue;
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == ITOD)
+        case ITOD:
         {
             stk.top().dValue = (double)stk.top().iValue;
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == IGSTORE)
+        case IGSTORE:
         {
             memory[IR[ipx+1].opcode].iValue = stk.top().iValue;
             stk.pop();
             ipx += 2;
+            break;
         }        
-        else if(IR[ipx].opcode == ILSTORE)
+        case ILSTORE:
         {
             memory[IR[ipx+1].iValue+ebp].iValue = stk.top().iValue;
             stk.pop();
             ipx += 2;
+            break;
         }
-        else if(IR[ipx].opcode == DGSTORE)
+        case DGSTORE:
         {
             memory[IR[ipx+1].opcode].dValue = stk.top().dValue;
             stk.pop();
             ipx += 2;
+            break;
         }
-        else if(IR[ipx].opcode == DLSTORE)
+        case DLSTORE:
         {
             memory[IR[ipx+1].iValue+ebp].dValue = stk.top().dValue;
             stk.pop();
             ipx += 2;        
+            break;
         }
-        else if(IR[ipx].opcode == IFCMP)
+        case IFCMP:
         {
             if(stk.top().iValue != 0)
                 ipx = IR[ipx+1].opcode;
             else
                 ipx += 2;
             stk.pop();
+            break;
         }        
-        else if(IR[ipx].opcode == IFNCMP)
+        case IFNCMP:
         {
             if(stk.top().iValue == 0)
                 ipx = IR[ipx+1].opcode;
             else
                 ipx += 2;
             stk.pop();
+            break;
         }
-        else if(IR[ipx].opcode == JUMP)
+        case JUMP:
         {
             ipx = IR[ipx+1].opcode;
+            break;
         }
-        else if(IR[ipx].opcode == JUMPBACK)
+        case JUMPBACK:
         {
             ipx = memory[ebp-1].address;
+            break;
         }
-        else if(IR[ipx].opcode == IRETURN)
+        case IRETURN:
         {
             irx = stk.top().iValue;
             stk.pop();
             ipx++;
+            break;
         }        
-        else if(IR[ipx].opcode == DRETURN)
+        case DRETURN:
         {
             drx = stk.top().dValue;
             stk.pop();
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == ISTORETOP)
+        case ISTORETOP:
         {
             memory[memory.size()-1].iValue = stk.top().iValue;
             stk.pop();
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == DSTORETOP)
+        case DSTORETOP:
         {
             memory[memory.size()-1].dValue = stk.top().dValue;
             stk.pop();
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == PUSHADRS)
+        case PUSHADRS:
         {
             esp = memory.size();
             data.address = IR[ipx+1].opcode;
             memory.push_back(data);
             ipx += 2;
+            break;
         }        
-        else if(IR[ipx].opcode == OLDEBP)
+        case OLDEBP:
         {
             ebp = memory[ebp].address;
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == OLDESP)
+        case OLDESP:
         {
             memory.resize(esp-IR[ipx+1].opcode);
             ipx += 2;
+            break;
         }
-        else if(IR[ipx].opcode == IRESULT)
+        case IRESULT:
         {
             data.iValue = irx;
             stk.push(data);
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == INEGATIVE)
+        case INEGATIVE:
         {
             stk.top().iValue = -stk.top().iValue;
             ipx++;
+            break;
         }        
-        else if(IR[ipx].opcode == DRESULT)
+        case DRESULT:
         {
             data.dValue = drx;
             stk.push(data);
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == DNEGATIVE)
+        case DNEGATIVE:
         {
             stk.top().dValue = -stk.top().dValue;
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == IGLOAD)
+        case IGLOAD:
         {
             data.iValue = memory[IR[ipx+1].opcode].iValue;
             stk.push(data);
             ipx += 2;
+            break;
         }
-        else if(IR[ipx].opcode == ILLOAD)
+        case ILLOAD:
         {
             data.iValue = memory[IR[ipx+1].iValue+ebp].iValue;
             stk.push(data);
             ipx += 2;
+            break;
         }        
-        else if(IR[ipx].opcode == DGLOAD)
+        case DGLOAD:
         {
             data.dValue = memory[IR[ipx+1].opcode].dValue;
             stk.push(data);
             ipx += 2;
+            break;
         }
-        else if(IR[ipx].opcode == DLLOAD)
+        case DLLOAD:
         {
             data.dValue = memory[IR[ipx+1].iValue+ebp].dValue;
             stk.push(data);
             ipx += 2;
+            break;
         }
-        else if(IR[ipx].opcode == ICONST)
+        case ICONST:
         {
             data.iValue = IR[ipx+1].iValue;
             stk.push(data);
             ipx += 2;
+            break;
         }
-        else if(IR[ipx].opcode == DCONST)
+        case DCONST:
         {
             data.dValue = IR[ipx+1].dValue;
             stk.push(data);
             ipx += 2;
+            break;
         }        
-        else if(IR[ipx].opcode == ITOD2)
+        case ITOD2:
         {
             MemType tmp = stk.top();
             stk.pop();
             stk.top().dValue = (double)stk.top().iValue;
             stk.push(tmp);
             ipx += 2;
+            break;
         }
-        else if(IR[ipx].opcode == IADD)
+        case IADD:
         {
             int right = stk.top().iValue;
             stk.pop();
@@ -1045,8 +1133,9 @@ void Interpreter::exec()
             data.iValue = left + right;
             stk.push(data);
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == DADD)
+        case DADD:
         {
             double right = stk.top().dValue;
             stk.pop();
@@ -1055,8 +1144,9 @@ void Interpreter::exec()
             data.dValue = left + right;
             stk.push(data);    
             ipx++;  
+            break;
         }
-        else if(IR[ipx].opcode == ISUB)
+        case ISUB:
         {
             int right = stk.top().iValue;
             stk.pop();
@@ -1065,8 +1155,9 @@ void Interpreter::exec()
             data.iValue = left - right;
             stk.push(data);
             ipx++;
+            break;
         }        
-        else if(IR[ipx].opcode == DSUB)
+        case DSUB:
         {
             double right = stk.top().dValue;
             stk.pop();
@@ -1075,8 +1166,9 @@ void Interpreter::exec()
             data.dValue = left - right;
             stk.push(data); 
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == IMUL)
+        case IMUL:
         {
             int right = stk.top().iValue;
             stk.pop();
@@ -1085,8 +1177,9 @@ void Interpreter::exec()
             data.iValue = left * right;
             stk.push(data);
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == DMUL)
+        case DMUL:
         {
             double right = stk.top().dValue;
             stk.pop();
@@ -1095,8 +1188,9 @@ void Interpreter::exec()
             data.dValue = left * right;
             stk.push(data);  
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == IDIV)
+        case IDIV:
         {
             int right = stk.top().iValue;
             stk.pop();
@@ -1105,8 +1199,9 @@ void Interpreter::exec()
             data.iValue = left / right;
             stk.push(data);
             ipx++;
+            break;
         }        
-        else if(IR[ipx].opcode == DDIV)
+        case DDIV:
         {
             double right = stk.top().dValue;
             stk.pop();
@@ -1115,8 +1210,9 @@ void Interpreter::exec()
             data.dValue = left / right;
             stk.push(data);  
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == ISML)
+        case ISML:
         {
             int right = stk.top().iValue;
             stk.pop();
@@ -1125,8 +1221,9 @@ void Interpreter::exec()
             data.iValue = left < right;
             stk.push(data);
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == DSML)
+        case DSML:
         {
             double right = stk.top().dValue;
             stk.pop();
@@ -1135,8 +1232,9 @@ void Interpreter::exec()
             data.dValue = left < right;
             stk.push(data);  
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == IBIG)
+        case IBIG:
         {
             int right = stk.top().iValue;
             stk.pop();
@@ -1145,8 +1243,9 @@ void Interpreter::exec()
             data.iValue = left > right;
             stk.push(data);
             ipx++;
+            break;
         }        
-        else if(IR[ipx].opcode == DBIG)
+        case DBIG:
         {
             double right = stk.top().dValue;
             stk.pop();
@@ -1155,8 +1254,9 @@ void Interpreter::exec()
             data.dValue = left > right;
             stk.push(data);  
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == ISMLEQL)
+        case ISMLEQL:
         {
             int right = stk.top().iValue;
             stk.pop();
@@ -1165,8 +1265,9 @@ void Interpreter::exec()
             data.iValue = left <= right;
             stk.push(data);  
             ipx++;     
+            break;
         }
-        else if(IR[ipx].opcode == DSMLEQL)
+        case DSMLEQL:
         {
             double right = stk.top().dValue;
             stk.pop();
@@ -1175,8 +1276,9 @@ void Interpreter::exec()
             data.dValue = left <= right;
             stk.push(data);  
             ipx++;
+            break;
         }        
-        else if(IR[ipx].opcode == IEQLEQL)
+        case IEQLEQL:
         {
             int right = stk.top().iValue;
             stk.pop();
@@ -1185,8 +1287,9 @@ void Interpreter::exec()
             data.iValue = left == right;
             stk.push(data);
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == DEQLEQL)
+        case DEQLEQL:
         {
             double right = stk.top().dValue;
             stk.pop();
@@ -1195,8 +1298,9 @@ void Interpreter::exec()
             data.dValue = left == right;
             stk.push(data);  
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == IBIGEQL)
+        case IBIGEQL:
         {
             int right = stk.top().iValue;
             stk.pop();
@@ -1205,8 +1309,9 @@ void Interpreter::exec()
             data.iValue = left >= right;
             stk.push(data);
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == DBIGEQL)
+        case DBIGEQL:
         {
             double right = stk.top().dValue;
             stk.pop();
@@ -1215,8 +1320,9 @@ void Interpreter::exec()
             data.dValue = left >= right;
             stk.push(data);  
             ipx++;
+            break;
         }        
-        else if(IR[ipx].opcode == INOTEQL)
+        case INOTEQL:
         {
             int right = stk.top().iValue;
             stk.pop();
@@ -1225,8 +1331,9 @@ void Interpreter::exec()
             data.iValue = left != right;
             stk.push(data);
             ipx++;
+            break;
         }
-        else if(IR[ipx].opcode == DNOTEQL)
+        case DNOTEQL:
         {
             double right = stk.top().dValue;
             stk.pop();
@@ -1235,7 +1342,10 @@ void Interpreter::exec()
             data.dValue = left != right;
             stk.push(data);  
             ipx++;
+            break;
+        }
         }
     }
 
 }
+

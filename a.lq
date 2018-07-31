@@ -1,26 +1,24 @@
 int[3] array;
 int global;
 int static;
-
-int func(int i)
+ int func(int i)
 {
     static = 0;
-    if(i==0){
-        while(static < 10)
-        {
-            static = static + 1;
-        }
-    }else{
-        return static + i;
+    while(static < 10)
+    {
+        static = static + 1;
     }
+    return static + i;
 }
-
-int main()
+ int main()
 {
     global = 5;
     int a;
-    a = func(0);
-    return a;
+    a = func(global);
+    double t;
+    t = -3.1;
+    t = t / 2;
+    t = a + t;
+    a = t;
+    return global;
 }
-
-
